@@ -382,7 +382,7 @@ class datagroup:
             
             bh_hist:hist.Hist = _hist['hist'][{
                 "channel" : self.channel,
-                self.observable : hist.rebin(self.rebin)
+                self.observable : hist.rebin(deepcopy(self.rebin)) if isinstance(self.rebin, int) else hist.rebin(groups=deepcopy(self.rebin))
             }]
             _scale = 1 
             if ptype.lower() != "data": 
