@@ -350,7 +350,8 @@ class datagroup:
     def __init__(self, histograms, observable:str="MT", name:str="DY",
                  channel:str="catSR_VBS", ptype:str="background", 
                  luminosity:float=1.0, rebin:int=1, 
-                 xsections:Dict={}, binrange:List=[]):
+                 xsections:Dict={}, binrange:List=[],
+                 remap_class_name:str=None):
 
         self.histograms = histograms
         self.name  = name
@@ -366,6 +367,35 @@ class datagroup:
         # droping bins the same way as droping elements in numpy arrays a[1:3]
         self.binrange = binrange
 
+        if remap_class_name is not None:
+            try:
+                from dctools.remap import remap_master_class_dict
+                self.remap_class = remap_master_class_dict[remap_class_name]
+                # Set the skip_scale attribute according to the class's expected behavior
+                self.skip_scale = self.remap_class.skip_scale(self)
+                replaces_group_type_by_channelmap = self.remap_class.replaces_group_and_type(self)
+                if self.channel in replaces_group_type_by_channelmap:
+                    self.remap_replace_group_name, self.remap_replace_type = replaces_group_type_by_channelmap[self.channel]
+                else:
+                    self.remap_replace_group_name, self.remap_replace_type = None, None
+                # permit general updaters of any datagroup parameters... but take care, could make logic hard to follow
+                # for all attributes, check if the function set has a remapping function for the datagroup
+                for attribute in ["name", "ptype", "lumi", "xsec", "outfile", "channel", "nominal", "systvar", "rebin", "observable", "binrange"]:
+                    if hasattr(self.remap_class, attribute):
+                        setattr(self, attribute, getattr(self.remap_class, attribute)(self))
+            except Exception as e:
+                print(f"[WARNING] unable to import remap class `{remap_class_name}`, available functions are in remap_master_class_dict, will proceed without it")
+                traceback.print_exc()
+                self.remap_class = None
+                self.remap_replace_group_name = None
+                self.remap_replace_type = None
+                self.skip_scale = False # by default, we scale all MC samples, data will still be skipped by double condition
+        else:
+            self.remap_class = None
+            self.remap_replace_group_name = None
+            self.remap_replace_type = None
+            self.skip_scale = False # by default, we scale all MC samples, data will still be skipped by double condition
+
         self.stacked:hist.Hist = hist.Hist() 
         if isinstance(list(self.histograms.values())[0]["hist"], dict):
             self.histograms = {
@@ -374,6 +404,10 @@ class datagroup:
                         "sumw":v["sumw"]
                     } for k, v in self.histograms.items()
             }
+        # Now we engage the remapping function to transform histograms, if present. This may shift e.g. data driven variations in some region A into a differently-named systematic and region
+        if hasattr(self.remap_class, "histograms"):
+            self.histograms = self.remap_class.histograms(self)
+
 
         for proc, _hist in self.histograms.items():
             # skip empty catgeories
@@ -385,7 +419,8 @@ class datagroup:
                 self.observable : hist.rebin(deepcopy(self.rebin)) if isinstance(self.rebin, int) else hist.rebin(groups=deepcopy(self.rebin))
             }]
             _scale = 1 
-            if ptype.lower() != "data": 
+            if not (ptype.lower() == "data" or self.skip_scale):
+                # Scale only MonteCarlo, skipping 'data' and anything which uses remapping functions and specifies to skip_scale (as this may be data-driven) 
                 _scale = self.xs_scale(
                     sumw=_hist['sumw'], 
                     proc=proc
@@ -450,6 +485,9 @@ class datagroup:
         new_datagroup = deepcopy(other)
         new_datagroup.stacked = self.stacked + other.stacked
         return new_datagroup
+    
+    def __repr__(self) -> str:
+        return f"datagroup(\n\tname={self.name}, \n\tptype={self.ptype}, \n\tchannel={self.channel}, \n\tobservable={self.observable}, \n\trebin={self.rebin}, \n\tbinrange={self.binrange}, \n\thistograms={[k for k in self.histograms]}, \n\tremap_class={self.remap_class.__class__.__name__ if self.remap_class else None}, \n\tskip_scale={self.skip_scale})\n"
 
 
 class datacard:
