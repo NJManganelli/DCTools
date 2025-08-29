@@ -1,0 +1,743 @@
+boosthist:
+  - ./data/merged-histogram-WZ-2018-Inc_WZ_latest_DD.pkl.gz
+  # - ./data/merged-histogram-WZ-2018-Inc_WZ_vtight_latest_ABCD_final.pkl.gz
+  # - ./data/merged-histogram-WZ-2018-Inc_WZ_vtight_latest_met_corr_final.pkl.gz
+  # - ./data/merged-histogram-WZ-2018-Inc_WZ_latest_tau_rebin.pkl.gz
+  
+    
+xsections:
+  !include ./config/inc-WZ/xsections_2018.yaml
+
+luminosity:
+  # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0
+  value: 59.83
+  uncer: 1.025
+
+groups:
+  WW:
+    processes:
+      - WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+    type:
+      background
+    color:
+      "#99B6F7"
+  WZ_ewk:
+    processes:
+      - WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8
+    type:
+      background
+    color:
+      "#33FFF6"
+  ZZ:
+    processes:
+      - ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+      - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
+      - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
+      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - ZZJJTo4L_TuneCP5_13TeV-madgraph-pythia8
+    type:
+      background
+    color:
+      "#cba6f7"
+  VBFZ:
+    processes:
+      - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
+    type:
+      background
+    color:
+      "#D2691E"
+  # ggzz:
+  #   processes:
+  #     - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+  #     - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+  #   type:
+  #     background
+  #   color:
+  #     "#D2691E"
+  DY:
+    processes:
+       #- DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
+      # - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+    type:
+      background
+    color:
+      "#F6D68D"
+  Top:
+    processes:
+      - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/.root
+      - ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8
+      - ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8
+      - ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8
+      - tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8
+      - TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+      - TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
+      - TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
+      - TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8
+      - TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8
+      - TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8
+    type:
+      background
+    color:
+      "#2E6D92"
+  VVV:
+    processes:
+      - WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8
+      - WZZ_TuneCP5_13TeV-amcatnlo-pythia8
+      - ZZZ_TuneCP5_13TeV-amcatnlo-pythia8
+    type:
+      background
+    color:
+      "#580C82"
+  # Wjets:
+  #   processes:
+  #     - WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8
+  #   type:
+  #     background
+  #   color:
+  #      "#FE4773"
+  WZ:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
+    type:
+      signal
+    color:
+      "#46B3A5"
+  DDDY:
+    processes:
+      - MuonEG
+      - DoubleMuon
+      - SingleMuon
+      - EGamma
+    type:
+      background
+    color:
+      "#2E8B57"
+    remap_class_name:
+      inc_WZ_DataDrivenDY
+  data:
+    processes:
+      - MuonEG
+      - DoubleMuon
+      - SingleMuon
+      - EGamma
+    type:
+      data
+    color:
+      "#181926"
+
+plotting:
+    inc-DY0:
+        dilep_mt:
+            rebin: 2
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dR:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+    inc-DY1:
+        dilep_mt:
+            rebin: 2
+            range: [0, 300]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+        mT_WZ:
+            # rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 10, 10] 
+            rebin: [5,5,5,5,5,5,5,5,5,5,5,5]
+            range: [0, 600]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dR:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        lead_jet_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+    inc-EM0:
+        dilep_mt:
+            rebin: 2
+            range: [0, 300]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dR:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+    inc-EM1:
+        dilep_mt:
+            rebin: 2
+            range: [0, 300]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: false
+        dilep_dR:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        lead_jet_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+
+    inc-SR0:
+        dilep_mt:
+            rebin: 4
+            range: [0, 1000]
+            blind: true
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        m_T:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        m_T_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        baseweight:
+            rebin: 1 
+            range: [-30, 30]
+            blind: true
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: true
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: true
+        tau_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        lead_jet_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        dphi_met_ll:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        delta_tau_met_phi:
+            rebin: 10
+            range: [0, 3.14159]
+            blind: true
+        dilep_dphi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        taus_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        taus_eta:
+            rebin: 1
+            range: [1, 2.5]
+            blind: true
+        dilep_dphi_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dilep_dR:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        deep_tau_jet:
+            rebin: 1
+            range: [0.8, 1.2]
+            blind: true
+        deep_tau_e:
+            rebin: 1
+            range: [0, 1]
+            blind: true
+        deep_tau_mu:
+            rebin: 1
+            range: [0, 1]
+            blind: true
+    inc-SR1:
+        dilep_mt:
+            rebin: 4
+            range: [0, 1000]
+            blind: true
+        m_T:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        m_T_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false00]
+            blind: true
+        baseweight:
+            rebin: 1 
+            range: [-30, 30]
+            blind: true
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        lead_jet_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: true
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: true
+        tau_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        taus_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        taus_eta:
+            rebin: 1
+            range: [0, 2.5]
+            blind: true
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_tau_met_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dilep_dphi_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dphi_jet_met:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R:
+            rebin: 1
+            range: [0, 3.5]
+            blind: true
+        dilep_dR:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R_jet_dilep:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R_jet_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        deep_tau_jet:
+            rebin: 1
+            range: [0.8, 1.2]
+            blind: true
+        deep_tau_e:
+            rebin: 1
+            range: [0, 1]
+            blind: true
+        deep_tau_mu:
+            rebin: 1
+            range: [0, 1]
+            blind: true
+    inc-SR_new:
+        dilep_mt:
+            rebin: 5
+            range: [0, 600]
+            blind: true
+        m_T:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        m_T_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: true
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: true
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: true
+        tau_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        taus_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        taus_eta:
+            rebin: 1
+            range: [0, 2.5]
+            blind: true
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_tau_met_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dilep_dphi_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R:
+            rebin: 1
+            range: [0, 3.5]
+            blind: true
+        dilep_dR:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+    inc-B0:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        m_T:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt_loose:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+    inc-B1:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        m_T:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt_loose:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+    inc-C0:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt_loose:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+    inc-C1:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt_loose:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+    inc-D0:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
+    inc-D1:
+        dilep_mt:
+            rebin: 2
+            range: [0, 400]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 400]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [0, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        tau_pt:
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        delta_R:
+            rebin: 1
+            range: [1, 5]
+            blind: false
+        mT_WZ:
+            rebin: 1
+            range: [0, 600]
+            blind: false
