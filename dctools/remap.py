@@ -43,7 +43,7 @@ class inc_WZ_DataDrivenDY:
             "inc-D1": "inc-C1",
         }
         syst_dict = {
-            "nominal": "dataddriven_DYUp",
+            "nominal": "datadriven_DYUp",
         }
         assert (expected_channel, expected_systvar) in inc_WZ_DataDrivenDY.expected_channels_systvars(None), f"In {__class__.__name__}, the expected (channel, systvar) pair ({expected_channel}, {expected_systvar}) is not found in the permitted expected_channels_systvars ({inc_WZ_DataDrivenDY.expected_channels_systvars(None)})"
         #assert expected_systvar in expected_systvars(None), f"In {__class__.__name__}, expected_systvar {expected_systvar} not found in permitted expected_systvars ({expected_systvars(None)})"
@@ -75,11 +75,17 @@ class inc_WZ_DataDrivenDY:
             new_hist = hist.Hist(*new_axes, storage=hist_data.storage_type())
             # Now we fill the new histogram by mapping the expected channel/syst to the original filled channel/syst
             for expected_channel, expected_systvar in inc_WZ_DataDrivenDY.expected_channels_systvars(dc_instance):
-                mapping = inc_WZ_DataDrivenDY.channel_syst_mapping(expected_channel=expected_channel, expected_systvar=expected_systvar)
                 # select the original histogram slice
                 try:
+                    mapping = inc_WZ_DataDrivenDY.channel_syst_mapping(expected_channel=expected_channel, expected_systvar=expected_systvar)
                     orig_slice = hist_data[{"channel": mapping["channel"], "systematic": mapping["systematic"]}]
                 except Exception as e:
+                    try:
+                        mapping = inc_WZ_DataDrivenDY.channel_syst_mapping(expected_channel=expected_channel, expected_systvar=expected_systvar)
+                        if mapping["systematic"] not in hist_data.axes['systematic']:
+                            warnings.warn(traceback.format_exc())
+                    except Exception as e2:
+                        pass
                     #warnings.warn(f"[WARNING] In {__class__.__name__}, unable to find the original histogram slice for expected (channel, systvar) = ({expected_channel}, {expected_systvar}) mapped to (channel, systvar) = ({mapping['channel']}, {mapping['systematic']}). The available channels are {list(hist_data.axes['channel'])} and the available systematics are {list(hist_data.axes['systematic'])}. Filling with zeroed histogram. datagroup={print(dc_instance)} Exception: {e}")
                     orig_slice = hist_data[{"channel": 0, "systematic": 0}].copy().reset()
                 # fill the new histogram slice
