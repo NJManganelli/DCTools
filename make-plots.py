@@ -18,8 +18,11 @@ np.seterr(all='warn')
 plt.ioff()
 
 from dctools import dict_to_hist_axis
-def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
+def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, remap_replacement_types = None, 
+             combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
     assert combine_fit in ["pre-combine", "prefit", "fit_b", "fit_s"]
+    if remap_replacement_types is None:
+        remap_replacement_types = [] #expected args: "datadriven", "validation"
     datasets:Dict = dict()
     color_cycle:List = []
     edges:Iterable[str] | Iterable[float] | None = None
@@ -38,17 +41,41 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
                 )
             )
             p = dctools.datagroup(
-                histograms = histograms,
-                ptype      = config.groups[name].type,
-                observable = variable,
-                name       = name,
-                xsections  = config.xsections,
-                channel    = channel,
-                luminosity = config.luminosity.value,
-                rebin      = rebin
+                histograms       = histograms,
+                ptype            = config.groups[name].type,
+                observable       = variable,
+                name             = name,
+                xsections        = config.xsections,
+                channel          = channel,
+                luminosity       = config.luminosity.value,
+                rebin            = rebin,
+                remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
             )
-            
-            datasets[p.name] = p
+            #remap_replacement_types lets us control whether we replace a given process with a remap type, such as a datadriven estimate. 
+            # The remap_class should have a method which returns a tuple of the config group name for which a remapped group replaces, and what type it is categorized as
+            # for example, in WZ, we have a data driven estimate for SR0 and SR1 derived from B0 and B1, and these are called "datadriven" to indicate they are for full replacement
+            # of the DY MonteCarlo
+            # Meanwhile, we can do some crossvalidation/closure tests by looking at the datadriven etimate derived for other regions, so their type is "validation"
+            # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
+            if p.remap_replace_group_name is not None:
+                if p.remap_replace_type in remap_replacement_types:
+                    print(f"Overwriting: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} replaced by {p.name}")
+                    # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
+                    datasets[p.remap_replace_group_name] = p
+                    if hasattr(config.groups[name], "color") and len(p.to_boost().shape):
+                        # must replace the previous color cycler...
+                        index = list(datasets.keys()).index(p.remap_replace_group_name)
+                        color_cycle[index] = config.groups[name].color
+                else:
+                    print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
+                    # this process is ignored / not added to the stack
+                    continue
+            else:
+                # nominal path for MC/data which doesn't have a remap_class and 
+                datasets[p.name] = p
+                # add the new color to the color cycler...
+                if hasattr(config.groups[name], "color") and len(p.to_boost().shape):
+                    color_cycle.append(config.groups[name].color)
             if p.ptype == "signal":
                 signal = p.name
         else:
@@ -72,8 +99,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
             if rebin != 1:
                 raise NotImplementedError("for combine prefit/fit_b/fit_s plotting the rebin functionality has not been implemented")
 
-        if hasattr(config.groups[name], "color") and (hasattr(p, "shape") and len(p.shape)) or len(p.to_boost().shape):
-            color_cycle.append(config.groups[name].color)
+            if hasattr(config.groups[name], "color") and (hasattr(p, "shape") and len(p.shape)) or len(p.to_boost().shape):
+                color_cycle.append(config.groups[name].color)
     
     if combine_fit == "pre-combine":
         _plot_channel = plotter.add_process_axis(datasets)
@@ -114,8 +141,9 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     ax.set_yscale('log')
 
     cmb_postfix = "-" + combine_fit if combine_fit in ["prefit", "fit_b", "fit_s"] else ""
-    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}.pdf')
-    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}.png')
+    rrt_postfix = "-" + "-".join(remap_replacement_types) if (isinstance(remap_replacement_types, list) and len(remap_replacement_types) > 0 and not (len(remap_replacement_types) == 1 and remap_replacement_types[0] == "nothing")) else ""
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.pdf')
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.png')
     plt.clf()
     
     if checksyst:
@@ -178,6 +206,7 @@ def main():
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-v"  , "--variables", nargs="*", type=str)
     parser.add_argument("-c"  , "--channels" , nargs='*', type=str)
+    parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
     parser.add_argument("-b"  , "--blindings" , nargs='*', type=bool, default=[False])
     parser.add_argument('--checksyst', action='store_true')
     parser.add_argument('-cf', "--combine_fit", type=str, default="pre-combine")
@@ -208,6 +237,7 @@ def main():
                                  xlim = [],
                                  blind = blind,
                                  era = options.era,
+                                 remap_replacement_types = options.remap_replacement_types,
                                  checksyst = False,
                                  combine_fit = options.combine_fit,
                                  combine_total_uncertainty = options.combine_total_uncertainty,
@@ -226,6 +256,7 @@ def main():
                                  xlim = [],
                                  blind = group_blind,
                                  #era = options.era, #picked up from configuration automatically
+                                 remap_replacement_types = options.remap_replacement_types, # may not be needed/used
                                  checksyst = False,
                                  combine_fit = options.combine_fit,
                                  combine_total_uncertainty = options.combine_total_uncertainty,
@@ -246,6 +277,7 @@ def main():
                              xlim = v_cfg.range,
                              blind = v_cfg.blind,
                              era = options.era,
+                             remap_replacement_types = options.remap_replacement_types,
                              checksyst = options.checksyst,
                              combine_fit = options.combine_fit,
                             )
