@@ -7,7 +7,7 @@ boosthist:
   - ./data/merged-histogram-cape-2018-withDD.pkl.gz
     
 xsections:
-  !include ./config/xsections_2018_allDY.yaml
+  !include ./config/vbs-ZZ/xsections_2018_allDY.yaml
 
 luminosity:
   # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0

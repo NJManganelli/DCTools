@@ -6,7 +6,7 @@ boosthist:
   #- ./data/merged-histogram-tromso-2016-withDD.pkl.gz
   - ./data/merged-histogram-tromso-2016-withDD.pkl.gz
 xsections:
-  !include ./config/xsections_2018.yaml
+  !include ./config/vbs-ZZ/xsections_2018.yaml
 
 luminosity: 
   value: 16.5

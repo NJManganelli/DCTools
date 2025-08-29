@@ -1,4 +1,4 @@
-boosthist:
+input_UL_2018-sinai-woDD.yaml boosthist:
   # - ./data/merged-histogram-fes-2018.pkl.gz
   #- ./data/merged-histogram-setif-2018.pkl.gz
   #- ./data/merged-histogram-oran-2018.pkl.gz
@@ -7,7 +7,7 @@ boosthist:
   - ./data/merged-histogram-tromso-2018-withDD.pkl.gz
     
 xsections:
-  !include ./config/xsections_2018.yaml
+  !include ./config/vbs-ZZ/xsections_2018.yaml
 
 luminosity:
   # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0
