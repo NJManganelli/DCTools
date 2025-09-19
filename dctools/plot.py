@@ -5,9 +5,11 @@ import os
 import numpy as np
 import matplotlib as mlp
 import matplotlib.pyplot as plt
+import mplhep as hep
 from typing import Any, List, Iterable
 from hist.intervals import ratio_uncertainty
 from . import datagroup
+from . import plot as plotter
 from cycler import cycler
 from scipy import interpolate
 
@@ -422,4 +424,143 @@ def check_systematic(
             
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.pdf')
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.png')
-            
+
+def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, remap_replacement_types = None, 
+             combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
+    assert combine_fit in ["pre-combine", "prefit", "fit_b", "fit_s"]
+    if remap_replacement_types is None:
+        remap_replacement_types = [] #expected args: "datadriven", "validation"
+    datasets:Dict = dict()
+    color_cycle:List = []
+    edges:Iterable[str] | Iterable[float] | None = None
+    combine_uncertainty_histo: hist.Hist | None = None
+    combine_channels: List[str] | None = None
+    combine_lumi: int | None = None
+    combine_era: str | None = None
+
+    for ng, name in enumerate(config.groups):
+        if combine_fit == "pre-combine":
+            # handle the plotting of histograms directly from SMQawa
+            histograms = dict(
+                filter(
+                    lambda _n: _n[0] in config.groups[name].processes,
+                    config.boosthist.items()
+                )
+            )
+            p = datagroup(
+                histograms       = histograms,
+                ptype            = config.groups[name].type,
+                observable       = variable,
+                name             = name,
+                xsections        = config.xsections,
+                channel          = channel,
+                luminosity       = config.luminosity.value,
+                rebin            = rebin,
+                remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
+            )
+            #remap_replacement_types lets us control whether we replace a given process with a remap type, such as a datadriven estimate. 
+            # The remap_class should have a method which returns a tuple of the config group name for which a remapped group replaces, and what type it is categorized as
+            # for example, in WZ, we have a data driven estimate for SR0 and SR1 derived from B0 and B1, and these are called "datadriven" to indicate they are for full replacement
+            # of the DY MonteCarlo
+            # Meanwhile, we can do some crossvalidation/closure tests by looking at the datadriven etimate derived for other regions, so their type is "validation"
+            # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
+            if p.remap_replace_group_name is not None:
+                if p.remap_replace_type in remap_replacement_types:
+                    print(f"Overwriting: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} replaced by {p.name}")
+                    # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
+                    datasets[p.remap_replace_group_name] = p
+                    if hasattr(config.groups[name], "color") and len(p.to_boost().shape):
+                        # must replace the previous color cycler...
+                        index = list(datasets.keys()).index(p.remap_replace_group_name)
+                        color_cycle[index] = config.groups[name].color
+                else:
+                    print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
+                    # this process is ignored / not added to the stack
+                    continue
+            else:
+                # nominal path for MC/data which doesn't have a remap_class and 
+                datasets[p.name] = p
+                # add the new color to the color cycler...
+                if hasattr(config.groups[name], "color") and len(p.to_boost().shape):
+                    color_cycle.append(config.groups[name].color)
+            if p.ptype == "signal":
+                signal = p.name
+        else:
+            # handle the combine prefit or postfit inputs similarly to the pre-combine path, with a channel selection ala dctools.datagroup
+            if ng == 0:
+                if combine_channel_group is not None:
+                    combine_channels_config = config.combinehist[name]["channel_groups"][variable][combine_channel_group]
+                    combine_channels = combine_channels_config.channels
+                    combine_lumi = combine_channels_config.luminosity
+                    combine_era = combine_channels_config.era
+                else:
+                    combine_channels = channel
+                    combine_era = era
+                combine_uncertainty_histo = config.combinehist[combine_total_uncertainty][combine_fit][variable][{"channel": combine_channels}]
+                edges = config.combinehist[name]["edges"][variable]
+            p = config.combinehist[name][combine_fit][variable][{"channel": combine_channels}]
+            # for the 'systematic' axis and with adding/regularizing the '
+            datasets[name] = p
+            if config.groups[name].type == "signal":
+                signal = name
+            if rebin != 1:
+                raise NotImplementedError("for combine prefit/fit_b/fit_s plotting the rebin functionality has not been implemented")
+
+            if hasattr(config.groups[name], "color") and (hasattr(p, "shape") and len(p.shape)) or len(p.to_boost().shape):
+                color_cycle.append(config.groups[name].color)
+    
+    if combine_fit == "pre-combine":
+        _plot_channel = plotter.add_process_axis(datasets)
+    else:
+        _plot_channel = dctools.dict_to_hist_axis(datasets, axis_name='process', axis_label=None, axis_type = 'StrCategory')
+        combine_uncertainty_histo = combine_uncertainty_histo.project('systematic', variable)
+    pred = _plot_channel.project('process', 'systematic', variable)[:hist.loc('data'),:,:]   
+    data = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('data'),:]
+    
+
+    plt.figure(figsize=(6,7))
+    ax, bx = plotter.mcplot(
+        pred[{'systematic':'nominal'}].stack('process'),
+        data=None if blind else data,
+        syst=pred.stack('process'),
+        colors = color_cycle,
+        combine_fit=combine_fit,
+        combine_uncertainty_histo=combine_uncertainty_histo[{'systematic':'nominal'}] if combine_uncertainty_histo else None,
+        combine_histo_edges=edges,
+    )
+
+    ymax = np.max([10000]+[c.get_height() for c in ax.containers[0] if ~np.isnan(c.get_height())])
+    ymin = np.min([0.001]+[c.get_height() for c in ax.containers[0] if ~np.isnan(c.get_height())])
+
+    ax.set_ylim(0.001, 1000*ymax)
+    try:
+        sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('VBSZZ2l2nu'),:]   
+        sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('ZZ2l2nu'),:]   
+        sig_ewk.plot(ax=ax, histtype='step', color='red')
+        sig_qcd.plot(ax=ax, histtype='step', color='purple')
+    except:
+        pass
+    bx.set_ylim([0.1, 1.9])
+    if len(xlim) > 0:
+        bx.set_xlim(xlim)
+    ax.set_title(f"channel {combine_channel_group or channel}: {combine_era or era}")
+    hep.cms.label("", ax=ax, data=not blind, lumi=combine_lumi, year=combine_era or int(era)) #add lumi=lumi, add year=int(era) with handling of APV, etc.
+    ax.set_yscale('log')
+
+    cmb_postfix = "-" + combine_fit if combine_fit in ["prefit", "fit_b", "fit_s"] else ""
+    rrt_postfix = "-" + "-".join(remap_replacement_types) if (isinstance(remap_replacement_types, list) and len(remap_replacement_types) > 0 and not (len(remap_replacement_types) == 1 and remap_replacement_types[0] == "nothing")) else ""
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.pdf')
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.png')
+    plt.clf()
+    
+    if checksyst:
+        pred = _plot_channel.project('process','systematic', variable)[:hist.loc('data'),:,:]
+        data = _plot_channel[{'systematic':'nominal'}].project('process',variable)[hist.loc('data'),:] 
+        plotter.check_systematic(
+            pred[{'systematic':'nominal'}].stack('process'),
+            syst=pred.stack('process'),
+            plot_file_name=f'check-sys-{channel}-{era}', 
+            xrange=xlim
+        )
+        plt.clf()
+    return _plot_channel, datasets
