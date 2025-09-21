@@ -75,6 +75,7 @@ def main():
     )
     parser.add_argument('--blind', action='store_true', help='blinding the channel')
     parser.add_argument('--checksyst', action='store_true')
+    parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
 
     options = parser.parse_args()
     config = dctools.read_config(options.input)
@@ -110,10 +111,28 @@ def main():
             channel    = options.channel,
             luminosity = config.luminosity.value,
             rebin      = options.rebin,
-            era        = options.era
+            remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
+            # era        = options.era,
         )
 
-        datasets[p.name] = p
+        #remap_replacement_types lets us control whether we replace a given process with a remap type, such as a datadriven estimate.
+        # The remap_class should have a method which returns a tuple of the config group name for which a remapped group replaces, and what type it is categorized as
+        # for example, in WZ, we have a data driven estimate for SR0 and SR1 derived from B0 and B1, and these are called "datadriven" to indicate they are for full replacement
+        # of the DY MonteCarlo
+        # Meanwhile, we can do some crossvalidation/closure tests by looking at the datadriven etimate derived for other regions, so their type is "validation"
+        # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
+        if p.remap_replace_group_name is not None:
+            if p.remap_replace_type in options.remap_replacement_types:
+                print(f"Overwriting: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} replaced by {p.name}")
+                # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
+                datasets[p.remap_replace_group_name] = p
+            else:
+                print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
+                # this process is ignored / not added to the stack
+                continue
+        else:
+            # nominal path for MC/data which doesn't have a remap_class and
+            datasets[p.name] = p
         if p.ptype == "signal":
             signal = p.name
 
@@ -194,18 +213,18 @@ def main():
         # JES/JES and UEPS
         card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False)
 
-        card.add_shape_nuisance(p.name, f"JES_Absolute{year}"      , p.get(f"JES_Absolute{year}")      , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_BBEC1{year}"         , p.get(f"JES_BBEC1{year}")         , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_EC2{year}"           , p.get(f"JES_EC2{year}")           , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_HF{year}"            , p.get(f"JES_HF{year}")            , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_RelativeSample{year}", p.get(f"JES_RelativeSample{year}"), symmetrise=False) 
+        card.add_shape_nuisance(p.name, f"JES_Absolute{year}"      , p.get(f"JES_Absolute{year}")      , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_BBEC1{year}"         , p.get(f"JES_BBEC1{year}")         , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_EC2{year}"           , p.get(f"JES_EC2{year}")           , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_HF{year}"            , p.get(f"JES_HF{year}")            , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_RelativeSample{year}", p.get(f"JES_RelativeSample{year}"), symmetrise=False)
 
-        card.add_shape_nuisance(p.name, f"JES_Absolute"   , p.get("JES_Absolute")   , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_BBEC1"      , p.get("JES_BBEC1")      , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_EC2"        , p.get("JES_EC2")        , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_HF"         , p.get("JES_HF")         , symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_RelativeBal", p.get("JES_RelativeBal"), symmetrise=False) 
-        card.add_shape_nuisance(p.name, f"JES_FlavorQCD"  , p.get("JES_FlavorQCD")  , symmetrise=False) 
+        card.add_shape_nuisance(p.name, f"JES_Absolute"   , p.get("JES_Absolute")   , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_BBEC1"      , p.get("JES_BBEC1")      , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_EC2"        , p.get("JES_EC2")        , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_HF"         , p.get("JES_HF")         , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_RelativeBal", p.get("JES_RelativeBal"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"JES_FlavorQCD"  , p.get("JES_FlavorQCD")  , symmetrise=False)
 
         card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", p.get("JER"), symmetrise=False)
         card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
@@ -249,18 +268,18 @@ def main():
             card.add_shape_nuisance(p.name, "ewk_corr_ZZ", p.get("kEW"), symmetrise=False)
 
         # define rates
-        # if p.name  in ["WW"]:
+        # define rate for DY category
+        if p.name in ["DY"]:
+            if "DY" in card_name:
+                card.add_rate_param(f"NormDY_{options.era}", "inc-DY*", p.name)
+            elif "SR" in card_name:
+                card.add_rate_param(f"NormDY_{options.era}", card_name+'*', p.name)
+        # elif p.name  in ["WW"]:
         #     if "inc-EM" in card_name:
         #         card.add_rate_param(f"NormWW_{options.era}", "inc-EM*", p.name)
         #     elif "SR" in card_name:
         #         card.add_rate_param(f"NormWW_{options.era}", card_name+'*', p.name)
 
-        # define rate for DY category
-        elif p.name in ["DY"]:
-            if "DY" in card_name:
-                card.add_rate_param(f"NormDY_{options.era}", "inc-DY*", p.name)
-            elif "SR" in card_name:
-                card.add_rate_param(f"NormDY_{options.era}", card_name+'*', p.name)
 
     # saving the datacard
     card.dump()
