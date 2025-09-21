@@ -551,7 +551,7 @@ class datacard:
 
     def add_log_normal(self, process, name, value): 
         nuisance = "{:<32} lnN".format(name)
-        if name not in self.nuisances:
+        if nuisance not in self.nuisances:
             self.nuisances[nuisance] = {}
         self.nuisances[nuisance][process] = value
 
