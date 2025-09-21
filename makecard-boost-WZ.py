@@ -126,6 +126,8 @@ def main():
             if p.remap_replace_type in options.remap_replacement_types:
                 print(f"Overwriting: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} replaced by {p.name}")
                 # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
+                p.remap_original_group_name = p.name
+                p.name = p.remap_replace_group_name
                 datasets[p.remap_replace_group_name] = p
             else:
                 print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
