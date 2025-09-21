@@ -124,7 +124,7 @@ def main():
         # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
         if p.remap_replace_group_name is not None:
             if p.remap_replace_type in options.remap_replacement_types:
-                print(f"Overwriting: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} replaced by {p.name}")
+                rich.print(f"Overwriting: channel: [red]{p.channel}[/red] type: {p.remap_replace_type}, [yellow]{p.remap_replace_group_name}[/yellow] replaced by [green]{p.name}")
                 # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
                 p.remap_original_group_name = p.name
                 p.name = p.remap_replace_group_name
@@ -192,6 +192,7 @@ def main():
     
     card.add_observation(data_obs)
 
+    rich.print("[yellow]btag uncertainties disabled")
     for _, p in datasets.items():
         # Systematics Conventions: https://gitlab.cern.ch/cms-analysis/general/systematics/-/blob/master/systematics_master.yml?ref_type=heads
         print(" --> ", p.name)
@@ -215,7 +216,7 @@ def main():
 
         if p.remap_replace_group_name is not None:
             # If we later decide to add shape nuisances to e.g. datadriven estimates, we'll need to eliminate or alter this code path
-            rich.print(f"[red]Skipping shape nuisances for [green]{p.name} (remap_replace_group_name={p.remap_replace_group_name})")
+            rich.print(f"[red]Skipping shape nuisances for [green]{p.name} (remap_original_group_name={p.remap_original_group_name})")
         else:
             # scale factors / resolution
             card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=True)
@@ -247,7 +248,6 @@ def main():
             card.add_shape_nuisance(p.name, f"PS_FSR_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
             card.add_shape_nuisance(p.name, f"PS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
 
-            rich.print("[yellow]btag uncertainties disabled")
             # b-tagging uncertainties
             # btag_sf_bc_2016APV, btag_sf_light_2016APV
             # try:
