@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from dctools import plot as plotter
 from typing import Any, IO
 import numpy as np
+import rich
 
 class config_input:
     def __init__(self, cfg):
@@ -190,6 +191,7 @@ def main():
     card.add_observation(data_obs)
 
     for _, p in datasets.items():
+        # Systematics Conventions: https://gitlab.cern.ch/cms-analysis/general/systematics/-/blob/master/systematics_master.yml?ref_type=heads
         print(" --> ", p.name)
         if len(p.to_boost().shape) == 0 or p.get("nominal").sum().value == 0:
             print(f"--> histogram for the process {p.name} is empty !")
@@ -201,71 +203,84 @@ def main():
         year = options.era.replace('APV','')
         
         # luminausity
-        card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
-        
-        # scale factors / resolution
-        card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=True)
-        card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=True)
-        card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}"  , p.get("TauEn")   , symmetrise=True)
-        card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"CMS_trig_sf_{options.era}", p.get("triggerSF") , symmetrise=False)
+        # card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
+        if options.era in ["2016", "2017", "2018"]:
+            card.add_log_normal(p.name, f"CMS_lumi_{options.era}", getattr(config.luminosity, f"uncer_lumi_{options.era}"))
+            card.add_log_normal(p.name, f"CMS_lumi_13TeV_1718", getattr(config.luminosity, f"uncer_lumi_13TeV_1718"))
+            card.add_log_normal(p.name, f"CMS_lumi_13TeV_correlated", getattr(config.luminosity, f"uncer_lumi_13TeV_correlated"))
+        else:
+            raise NotImplementedError("non-Run2 Lmunisoty uncertainties not implemented yet")
 
-        # JES/JES and UEPS
-        card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False)
+        if p.remap_replace_group_name is not None:
+            # If we later decide to add shape nuisances to e.g. datadriven estimates, we'll need to eliminate or alter this code path
+            rich.print(f"[red]Skipping shape nuisances for [green]{p.name} (remap_replace_group_name={p.remap_replace_group_name})")
+        else:
+            # scale factors / resolution
+            card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}"  , p.get("TauEn")   , symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_trig_sf_{options.era}", p.get("triggerSF") , symmetrise=False)
 
-        card.add_shape_nuisance(p.name, f"JES_Absolute{year}"      , p.get(f"JES_Absolute{year}")      , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_BBEC1{year}"         , p.get(f"JES_BBEC1{year}")         , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_EC2{year}"           , p.get(f"JES_EC2{year}")           , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_HF{year}"            , p.get(f"JES_HF{year}")            , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_RelativeSample{year}", p.get(f"JES_RelativeSample{year}"), symmetrise=False)
+            # JES/JES and UEPS
+            card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False)
 
-        card.add_shape_nuisance(p.name, f"JES_Absolute"   , p.get("JES_Absolute")   , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_BBEC1"      , p.get("JES_BBEC1")      , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_EC2"        , p.get("JES_EC2")        , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_HF"         , p.get("JES_HF")         , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_RelativeBal", p.get("JES_RelativeBal"), symmetrise=False)
-        card.add_shape_nuisance(p.name, f"JES_FlavorQCD"  , p.get("JES_FlavorQCD")  , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_Absolute{year}"      , p.get(f"JES_Absolute{year}")      , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_BBEC1{year}"         , p.get(f"JES_BBEC1{year}")         , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_EC2{year}"           , p.get(f"JES_EC2{year}")           , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_HF{year}"            , p.get(f"JES_HF{year}")            , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_RelativeSample{year}", p.get(f"JES_RelativeSample{year}"), symmetrise=False)
 
-        card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", p.get("JER"), symmetrise=False)
-        card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
-        
-        # Can maybe ne correlated over era's?
-        card.add_shape_nuisance(p.name, f"PS_FSR_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
-        card.add_shape_nuisance(p.name, f"PS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
-        
+            card.add_shape_nuisance(p.name, f"JES_Absolute"   , p.get("JES_Absolute")   , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_BBEC1"      , p.get("JES_BBEC1")      , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_EC2"        , p.get("JES_EC2")        , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_HF"         , p.get("JES_HF")         , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_RelativeBal", p.get("JES_RelativeBal"), symmetrise=False)
+            card.add_shape_nuisance(p.name, f"JES_FlavorQCD"  , p.get("JES_FlavorQCD")  , symmetrise=False)
 
-        # b-tagging uncertainties
-        # btag_sf_bc_2016APV, btag_sf_light_2016APV
-        # try:
-        #     card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}" , p.get(f"btag_sf_light_{options.era}"), symmetrise=True)
-        #     card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}"  , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
-        #     card.add_shape_nuisance(p.name, f"CMS_btag_df_stat_{options.era}", p.get("btag_sf_stat")            , symmetrise=False)
-        # except:
-        #     pass
-        # # b-tagging uncertainties correlated over years
-        # card.add_shape_nuisance(p.name, "CMS_btag_sf_bc"  , p.get("btag_sf_bc_correlated")   , symmetrise=False)
-        # card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", p.get("JER"), symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
 
-        # other uncertainties
-        card.add_shape_nuisance(p.name, f"CMS_pileup_{options.era}", p.get("pileup_weight"), symmetrise=False)
+            # Can maybe ne correlated over era's?
+            card.add_shape_nuisance(p.name, f"PS_FSR_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
+            card.add_shape_nuisance(p.name, f"PS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
+
+            rich.print("[yellow]btag uncertainties disabled")
+            # b-tagging uncertainties
+            # btag_sf_bc_2016APV, btag_sf_light_2016APV
+            # try:
+            #     card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}" , p.get(f"btag_sf_light_{options.era}"), symmetrise=True)
+            #     card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}"  , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
+            #     card.add_shape_nuisance(p.name, f"CMS_btag_df_stat_{options.era}", p.get("btag_sf_stat")            , symmetrise=False)
+            # except:
+            #     pass
+            # # b-tagging uncertainties correlated over years
+            # card.add_shape_nuisance(p.name, "CMS_btag_sf_bc"  , p.get("btag_sf_bc_correlated")   , symmetrise=False)
+            # card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=True)
+
+            # other uncertainties
+            card.add_shape_nuisance(p.name, f"CMS_pileup_{options.era}", p.get("pileup_weight"), symmetrise=False)
 
 
-        #QCD scale, PDF and other theory uncertainty
-        if 'gg' not in p.name:
-            card.add_qcd_scales(
-                    p.name, f"CMS_QCDScale{p.name}_{options.era}",
-                    [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
-        )
+            #QCD scale, PDF and other theory uncertainty
+            if 'gg' not in p.name:
+                card.add_qcd_scales(
+                        p.name, f"CMS_QCDScale{p.name}_{options.era}",
+                        [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
+            )
 
-        # PDF uncertaintites / not working for the moment
-        card.add_shape_nuisance(p.name, "pdf"   , p.get("PDF_weight"), symmetrise=False)
-        card.add_shape_nuisance(p.name, "alphaS", p.get("aS_weight" ), symmetrise=False)
+            # PDF uncertaintites / not working for the moment
+            card.add_shape_nuisance(p.name, "pdf"   , p.get("PDF_weight"), symmetrise=False)
+            card.add_shape_nuisance(p.name, "alphaS", p.get("aS_weight" ), symmetrise=False)
 
-        # Electroweak Corrections uncertainties
-        if ('WZ' in p.name):
-            card.add_shape_nuisance(p.name, "ewk_corr_WZ", p.get("kEW"), symmetrise=False)
-        if ('ZZ' in p.name) and ('EWK' not in p.name):
-            card.add_shape_nuisance(p.name, "ewk_corr_ZZ", p.get("kEW"), symmetrise=False)
+            # Electroweak Corrections uncertainties
+            if ('WZ' in p.name):
+                card.add_shape_nuisance(p.name, "ewk_corr_WZ", p.get("kEW"), symmetrise=False)
+            if ('ZZ' in p.name) and ('EWK' not in p.name):
+                card.add_shape_nuisance(p.name, "ewk_corr_ZZ", p.get("kEW"), symmetrise=False)
+
+            # Add Barlow-Beeston Lite MC Stat uncertainty
+            card.add_auto_stat()
 
         # define rates
         # define rate for DY category
