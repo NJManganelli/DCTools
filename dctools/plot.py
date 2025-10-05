@@ -173,15 +173,15 @@ def mcplot(
         pred_ksum = sum(pred)
         pred_values = pred_ksum.values(0)
         x_vals = pred_ksum.axes.centers[0]
-        l_edge = pred_ksum.axes.edges[0][0]
-        r_edge = pred_ksum.axes.edges[-1][-1]
+        l_edge = pred_ksum.axes.edges[0][:-1]
+        r_edge = pred_ksum.axes.edges[0][1:]
     if isinstance(pred, hist.Hist):
         pred_hstk = pred
         pred_ksum = pred
         pred_values = pred.values(0)
         x_vals = pred.axes.centers[0]
-        l_edge = pred.axes.edges[0][0]
-        r_edge = pred.axes.edges[-1][-1]
+        l_edge = pred.axes.edges[0][:-1]
+        r_edge = pred.axes.edges[0][1:]
     if isinstance(pred, List):
         pass
     
@@ -203,7 +203,7 @@ def mcplot(
     ax.bar( 
         x_vals, 
         height= 2*pred_stat_error,
-        width=(r_edge - l_edge) / len(x_vals),
+        width=r_edge - l_edge,
         bottom= pred_ksum.values(0) - pred_stat_error,
         fill=False,
         linewidth=0,
@@ -222,7 +222,7 @@ def mcplot(
         bx.bar(
             x_vals,
             height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
-            width  = (r_edge - l_edge) / len(x_vals),
+            width  = r_edge - l_edge,
             bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
             color  = "red" if (combine_fit == "pre-combine") else "blue",
             alpha  = 0.4,
@@ -294,7 +294,7 @@ def mcplot(
             bx.bar(
                 x_vals,
                 height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
-                width  = (r_edge - l_edge) / len(x_vals)
+                width  = r_edge - l_edge,
                 bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
                 color  = "blue", alpha  = 0.2, zorder = 0,
                 label="stat+syst"
@@ -307,7 +307,7 @@ def mcplot(
             )
     if (data is not None) and isinstance(pred, hist.Hist):
         data.plot(ax=ax, color='black', histtype='errorbar')
-    ax.set_xlim(l_edge, r_edge)
+    ax.set_xlim(l_edge[0], r_edge[-1])
     if combine_fit != "pre-combine" and combine_histo_edges is not None:
         # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
         assert len(combine_histo_edges) == len(bx.get_xticks()), f"mismatch of edges({combine_histo_edges}) and xticks({bx.get_xticks()})"
@@ -349,8 +349,8 @@ def check_systematic(
         
     pred_values = pred.values(0)   
     x_vals = pred.axes.centers[0]
-    l_edge = pred_ksum.axes.edges[0][0]
-    r_edge = pred_ksum.axes.edges[-1][-1]
+    l_edge = pred.axes.edges[0][:-1]
+    r_edge = pred.axes.edges[0][1:]
     
     pred_stat_error = np.sqrt(pred.values(0))
    
@@ -388,14 +388,14 @@ def check_systematic(
             ax.bar( 
                 x_vals, 
                 height= 2*pred_stat_error,
-                width=(r_edge - l_edge) / len(x_vals),
+                width=r_edge - l_edge,
                 bottom= pred.values(0) - pred_stat_error,
                 fill=False,
                 linewidth=0,
                 edgecolor="gray",
                 hatch=4 * "/",
             )
-            ax.set_xlim(l_edge, r_edge)
+            ax.set_xlim(l_edge[0], r_edge[-1])
             ax.legend(ncol=2, loc='upper right')
             ax.set_ylabel('events')
             ax.set_yscale('log')
@@ -407,7 +407,7 @@ def check_systematic(
                 bx.bar(
                     x_vals,
                     height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
-                    width  = (r_edge - l_edge) / len(x_vals),
+                    width  = r_edge - l_edge,
                     bottom = np.divide(pred_values - pred_stat_error, pred_values, where=pred_values!=0),
                     color  = "grey",
                     alpha  = 0.4,
@@ -526,8 +526,10 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     else:
         _plot_channel = dctools.dict_to_hist_axis(datasets, axis_name='process', axis_label=None, axis_type = 'StrCategory')
         combine_uncertainty_histo = combine_uncertainty_histo.project('systematic', variable)
-    pred = _plot_channel.project('process', 'systematic', variable)[:hist.loc('data'),:,:]
-    data = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('data'),:]
+    # projection must avoid the variable rebinning bug, this is a workaround and can be replaced by just variable once fixed: https://github.com/scikit-hep/hist/issues/639
+    variable_in_axes = variable if variable in _plot_channel.axes.name else ""
+    pred = _plot_channel.project('process', 'systematic', variable_in_axes)[:hist.loc('data'),:,:]
+    data = _plot_channel[{'systematic':'nominal'}].project('process', variable_in_axes)[hist.loc('data'),:]
     
 
     plt.figure(figsize=(6, 4.9 if no_ratios else 7))
