@@ -154,6 +154,7 @@ def mcplot(
     syst: List[hist.Hist] | hist.Hist = None, 
     proc_axis_name: str = 'process',
     syst_axis_name: str = 'systematic',
+    bin_width_norm: float | None = None,
     no_ratios: bool = False,
     combine_fit: str = 'pre-combine',
     combine_uncertainty_histo: hist.Hist | None = None,
@@ -188,7 +189,7 @@ def mcplot(
     if "colors" in kwargs:
         ax.update({"prop_cycle":cycler(color=kwargs["colors"])})
         
-    pred_hstk.plot(ax=ax, stack=True, histtype="fill")
+    pred_hstk.plot(ax=ax, stack=True, histtype="fill", binwnorm=bin_width_norm)
     if combine_fit == 'pre-combine':
         pred_stat_error = np.sqrt(np.abs(pred_ksum.values(0)))
     else:
@@ -200,11 +201,16 @@ def mcplot(
         else:
             # If we're missing the total uncertainty from a combine fit (prefit, fit_b, or fit_s) then don't draw any uncertainty band
             pred_stat_error = np.zeros_like(pred_ksum.values(0))
+    if bin_width_norm is not None:
+        # follow https://github.com/scikit-hep/mplhep/blob/main/src/mplhep/plot.py#L851-L858, in 1D case
+        pred_stat_error = pred_stat_error * bin_width_norm / (r_edge - l_edge)
+        pred_values_without_binwnorm = pred_values # needed for ratio later
+        pred_values = pred_values * bin_width_norm / (r_edge - l_edge)
     ax.bar( 
         x_vals, 
         height= 2*pred_stat_error,
-        width=r_edge - l_edge,
-        bottom= pred_ksum.values(0) - pred_stat_error,
+        width= r_edge - l_edge,
+        bottom= pred_values - pred_stat_error,
         fill=False,
         linewidth=0,
         edgecolor="gray",
@@ -230,12 +236,15 @@ def mcplot(
         )
 
     if data is not None:
-        data.plot(ax=ax, color='black', histtype='errorbar')
-        ratio = np.divide(data.values(0), pred_values, where=pred_values!=0)
+        data.plot(ax=ax, color='black', histtype='errorbar', binwnorm=bin_width_norm)
+        numerator_without_binwnorm = data.values(0)
+        numerator = data.values(0) if not bin_width_norm else data.values(0) * bin_width_norm / (r_edge - l_edge)
+        # numerator and pred_values are bin_width_normalized if active
+        ratio = np.divide(numerator, pred_values, where=pred_values!=0)
         if bx is not None:
             ratio_uncert = ratio_uncertainty(
-                num=data.values(0),
-                denom=pred_values,
+                num=numerator_without_binwnorm,
+                denom=pred_values_without_binwnorm if bin_width_norm is not None else pred_values,
             )
             bx.errorbar(
                 x_vals,
@@ -266,6 +275,9 @@ def mcplot(
             
             shape_up = sum([_hs[{syst_axis_name : s + 'Up'  }] for _hs in syst]).values(0)
             shape_dw = sum([_hs[{syst_axis_name : s + 'Down'}] for _hs in syst]).values(0)
+            if bin_width_norm is not None:
+                shape_up = shape_up * bin_width_norm / (r_edge - l_edge)
+                shape_dw = shape_dw * bin_width_norm / (r_edge - l_edge)
             
             var_up = np.where(
                 np.divide(np.abs(shape_up - pred_values), pred_values, where=shape_up!=0)>10, 
@@ -303,10 +315,10 @@ def mcplot(
     if isinstance(pred, hist.Hist):
         if proc_axis_name in pred.axes.name:
             pred.stack(proc_axis_name).plot(
-                ax=ax, stack=True, histtype="fill"
+                ax=ax, stack=True, histtype="fill", binwnorm=bin_width_norm
             )
     if (data is not None) and isinstance(pred, hist.Hist):
-        data.plot(ax=ax, color='black', histtype='errorbar')
+        data.plot(ax=ax, color='black', histtype='errorbar', binwnorm=bin_width_norm)
     ax.set_xlim(l_edge[0], r_edge[-1])
     if combine_fit != "pre-combine" and combine_histo_edges is not None:
         # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
@@ -326,7 +338,7 @@ def mcplot(
         bx.legend(loc='upper right', fontsize=15)
         bx.set_xlabel(pred_ksum.axes[0].label)
         bx.set_ylabel('data/mc')
-    ax.set_ylabel('events')
+    ax.set_ylabel('events' if not bin_width_norm else 'events/GeV')
     
     return ax, bx
 
@@ -337,9 +349,12 @@ def check_systematic(
     plot_file_name: str = 'check-sys',
     output_dir: str = './systematic-check/',
     xrange: List = [],
+    bin_width_norm: float | None = None,
     no_ratios: bool = False,
     **kwargs) -> Any:
     # inspired from boost Hist
+    if bin_width_norm is not None:
+        raise NotImplementedError("bin width normalisation not implemented for systematic checks")
     
     if not os.path.isdir(os.path.dirname(output_dir)):
         os.mkdir(os.path.dirname(output_dir))
@@ -437,7 +452,8 @@ def check_systematic(
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.pdf')
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.png')
 
-def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, remap_replacement_types = None, no_ratios=False,
+def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True,
+             remap_replacement_types = None, bin_width_norm=None, no_ratios=False,
              combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
     assert combine_fit in ["pre-combine", "prefit", "fit_b", "fit_s"]
     if remap_replacement_types is None:
@@ -449,6 +465,9 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     combine_channels: List[str] | None = None
     combine_lumi: int | None = None
     combine_era: str | None = None
+
+    if bin_width_norm is None and "bin_width_norm" in config:
+        bin_width_norm = config.bin_width_norm
 
     for ng, name in enumerate(config.groups):
         if combine_fit == "pre-combine":
@@ -551,8 +570,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     try:
         sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('VBSZZ2l2nu'),:]   
         sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('ZZ2l2nu'),:]   
-        sig_ewk.plot(ax=ax, histtype='step', color='red')
-        sig_qcd.plot(ax=ax, histtype='step', color='purple')
+        sig_ewk.plot(ax=ax, histtype='step', color='red', binwnorm=bin_width_norm)
+        sig_qcd.plot(ax=ax, histtype='step', color='purple', binwnorm=bin_width_norm)
     except:
         pass
     if bx is not None:
@@ -565,8 +584,12 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
 
     cmb_postfix = "-" + combine_fit if combine_fit in ["prefit", "fit_b", "fit_s"] else ""
     rrt_postfix = "-" + "-".join(remap_replacement_types) if (isinstance(remap_replacement_types, list) and len(remap_replacement_types) > 0 and not (len(remap_replacement_types) == 1 and remap_replacement_types[0] == "nothing")) else ""
-    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.pdf')
-    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}.png')
+    nrat_postfix = "-noratio" if no_ratios else ""
+    gbwn_postfix = f"-binwnorm{bin_width_norm}".replace(".", "p") if bin_width_norm is not None else ""
+    print(gbwn_postfix)
+    #xlim_postfix = f"-xlim{int(xlim[0])}-{int(xlim[1])}" if len(xlim) == 2 else ""
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.pdf')
+    plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.png')
     plt.clf()
     
     if checksyst:
@@ -578,6 +601,7 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
             plot_file_name=f'check-sys-{channel}-{era}', 
             xrange=xlim,
             no_ratios=no_ratios,
+            bin_width_norm=bin_width_norm,
         )
         plt.clf()
     return _plot_channel, datasets
