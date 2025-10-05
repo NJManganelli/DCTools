@@ -67,6 +67,7 @@ def main():
     parser.add_argument("-v"  , "--variables", nargs="*", type=str)
     parser.add_argument("-c"  , "--channels" , nargs='*', type=str)
     parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
+    parser.add_argument('--no_ratios', action='store_true', help='disable ratio panel in the plots')
     parser.add_argument("-b"  , "--blindings" , nargs='*', type=bool, default=[False])
     parser.add_argument('--checksyst', action='store_true')
     parser.add_argument('-cf', "--combine_fit", type=str, default="pre-combine")
@@ -138,6 +139,7 @@ def main():
                              blind = v_cfg.blind,
                              era = options.era,
                              remap_replacement_types = options.remap_replacement_types,
+                             no_ratios = options.no_ratios,
                              checksyst = options.checksyst,
                              combine_fit = options.combine_fit,
                             )
