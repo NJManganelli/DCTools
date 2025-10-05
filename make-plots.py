@@ -67,7 +67,8 @@ def main():
     parser.add_argument("-v"  , "--variables", nargs="*", type=str)
     parser.add_argument("-c"  , "--channels" , nargs='*', type=str)
     parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
-    parser.add_argument('--no_ratios', action='store_true', help='disable ratio panel in the plots')
+    parser.add_argument("-gbwn", "--global_bin_width_norm", type=float, default=None, const=1.0, nargs="?", help="if set, normalize all histograms to `bin_width_norm / bin_width`, suggested (const) bin_width_norm value is 1.0")
+    parser.add_argument("--no_ratios", action="store_true", help="disable ratio panel in the plots")
     parser.add_argument("-b"  , "--blindings" , nargs='*', type=bool, default=[False])
     parser.add_argument('--checksyst', action='store_true')
     parser.add_argument('-cf', "--combine_fit", type=str, default="pre-combine")
@@ -99,6 +100,8 @@ def main():
                                  blind = blind,
                                  era = options.era,
                                  remap_replacement_types = options.remap_replacement_types,
+                                 bin_width_norm = options.global_bin_width_norm,
+                                 no_ratios = options.no_ratios,
                                  checksyst = False,
                                  combine_fit = options.combine_fit,
                                  combine_total_uncertainty = options.combine_total_uncertainty,
@@ -118,6 +121,8 @@ def main():
                                  blind = group_blind,
                                  #era = options.era, #picked up from configuration automatically
                                  remap_replacement_types = options.remap_replacement_types, # may not be needed/used
+                                 bin_width_norm = options.global_bin_width_norm,
+                                 no_ratios = options.no_ratios,
                                  checksyst = False,
                                  combine_fit = options.combine_fit,
                                  combine_total_uncertainty = options.combine_total_uncertainty,
@@ -139,6 +144,7 @@ def main():
                              blind = v_cfg.blind,
                              era = options.era,
                              remap_replacement_types = options.remap_replacement_types,
+                             bin_width_norm = options.global_bin_width_norm,
                              no_ratios = options.no_ratios,
                              checksyst = options.checksyst,
                              combine_fit = options.combine_fit,
