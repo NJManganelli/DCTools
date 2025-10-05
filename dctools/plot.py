@@ -125,8 +125,9 @@ def add_process_axis(
 def make_split(ratio: float, gap: float = 0., ptype: str ="step") -> Any:
     from matplotlib.gridspec import GridSpec
     cax = plt.gca()
-    plt.setp(cax.get_xticklabels(), visible=False)
-    plt.setp(cax.get_yticklabels(), visible=False)
+    visible = True if ratio in [0, 1] else False
+    plt.setp(cax.get_xticklabels(), visible=visible)
+    plt.setp(cax.get_yticklabels(), visible=visible)
 
     box = cax.get_position()
     xmin, ymin = box.xmin, box.ymin
@@ -137,7 +138,9 @@ def make_split(ratio: float, gap: float = 0., ptype: str ="step") -> Any:
     elif ratio == 0:
         return None, cax
     gs = GridSpec(
-        2, 1, height_ratios=[ratio, 1 - ratio],
+        2,
+        1,
+        height_ratios=[ratio, 1 - ratio],
         left=xmin, right=xmax,
         bottom=ymin, top=ymax
     )
@@ -578,6 +581,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
         bx.set_ylim([0.1, 1.9])
         if len(xlim) > 0:
             bx.set_xlim(xlim)
+    elif len(xlim) > 0:
+        ax.set_xlim(xlim)
     ax.set_title(f"channel {combine_channel_group or channel}: {combine_era or era}")
     hep.cms.label("", ax=ax, data=not blind, lumi=combine_lumi, year=combine_era or int(era)) #add lumi=lumi, add year=int(era) with handling of APV, etc.
     ax.set_yscale('log')
