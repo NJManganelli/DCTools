@@ -413,11 +413,14 @@ class datagroup:
             # skip empty catgeories
             if self.channel not in _hist['hist'].axes['channel']:
                 continue
-            
+            observable_label = _hist['hist'].axes[self.observable].label
             bh_hist:hist.Hist = _hist['hist'][{
                 "channel" : self.channel,
                 self.observable : hist.rebin(deepcopy(self.rebin)) if isinstance(self.rebin, int) else hist.rebin(groups=deepcopy(self.rebin))
             }]
+            # Workaround for https://github.com/scikit-hep/hist/issues/639 which removes both name and axis label
+            variable_in_axes = self.observable if self.observable in bh_hist.axes.name else ""
+            bh_hist.axes[variable_in_axes].label = observable_label
             _scale = 1 
             if not (ptype.lower() == "data" or self.skip_scale):
                 # Scale only MonteCarlo, skipping 'data' and anything which uses remapping functions and specifies to skip_scale (as this may be data-driven) 
