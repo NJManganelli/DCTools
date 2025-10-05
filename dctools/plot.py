@@ -132,6 +132,10 @@ def make_split(ratio: float, gap: float = 0., ptype: str ="step") -> Any:
     xmin, ymin = box.xmin, box.ymin
     xmax, ymax = box.xmax, box.ymax
 
+    if ratio == 1:
+        return cax, None
+    elif ratio == 0:
+        return None, cax
     gs = GridSpec(
         2, 1, height_ratios=[ratio, 1 - ratio],
         left=xmin, right=xmax,
@@ -148,14 +152,15 @@ def mcplot(
     pred: List[hist.Hist] | hist.Hist | hist.Stack, # either a list of MC or a boost hist with sample axis
     data: List[hist.Hist] | hist.Hist = None, 
     syst: List[hist.Hist] | hist.Hist = None, 
-    proc_axis_name: str = 'process', 
-    syst_axis_name: str = 'systematic', 
+    proc_axis_name: str = 'process',
+    syst_axis_name: str = 'systematic',
+    no_ratios: bool = False,
     combine_fit: str = 'pre-combine',
     combine_uncertainty_histo: hist.Hist | None = None,
     combine_histo_edges: Iterable[int] | Iterable[float] | None = None,
     **kwargs) -> Any:
     # inspired from boost Hist
-    ax, bx = make_split(0.7)
+    ax, bx = make_split(1 if no_ratios else 0.7)
 
     x_vals = None
     l_edge = None
@@ -205,39 +210,41 @@ def mcplot(
         edgecolor="gray",
         hatch=4 * "/",
     )
-    bx.axhline(
-        1, color="black", linestyle="dashed", linewidth=1.0
-    )
+    if bx is not None:
+        bx.axhline(
+            1, color="black", linestyle="dashed", linewidth=1.0
+        )
     
-    # MC stat error bars
-    ratio = np.ones_like(pred_values)
-    ratio_uncert = np.zeros_like(pred_values)
+        # MC stat error bars
+        ratio = np.ones_like(pred_values)
+        ratio_uncert = np.zeros_like(pred_values)
 
-    bx.bar( 
-           x_vals, 
-           height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0), 
-           width  = (r_edge - l_edge) / len(x_vals),
-           bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
-           color  = "red" if (combine_fit == "pre-combine") else "blue",
-           alpha  = 0.4,
-           label="stat" if (combine_fit == "pre-combine") else "stat+syst",
-    )
+        bx.bar(
+            x_vals,
+            height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
+            width  = (r_edge - l_edge) / len(x_vals),
+            bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
+            color  = "red" if (combine_fit == "pre-combine") else "blue",
+            alpha  = 0.4,
+            label="stat" if (combine_fit == "pre-combine") else "stat+syst",
+        )
 
     if data is not None:
         data.plot(ax=ax, color='black', histtype='errorbar')
         ratio = np.divide(data.values(0), pred_values, where=pred_values!=0)
-        ratio_uncert = ratio_uncertainty(
-            num=data.values(0),
-            denom=pred_values,
-        )
-        bx.errorbar(
-            x_vals,
-            ratio,
-            yerr=ratio_uncert,
-            color="black",
-            marker="o",
-            linestyle="none",
-        )
+        if bx is not None:
+            ratio_uncert = ratio_uncertainty(
+                num=data.values(0),
+                denom=pred_values,
+            )
+            bx.errorbar(
+                x_vals,
+                ratio,
+                yerr=ratio_uncert,
+                color="black",
+                marker="o",
+                linestyle="none",
+            )
         
     if syst is not None and combine_fit == "pre-combine":
         syst_list = set([
@@ -276,21 +283,22 @@ def mcplot(
             
             syst_up.append((pred_values-var_up))
             syst_dw.append((pred_values-var_dw))
-            
-        syst_up = np.array(syst_up)
-        syst_dw = np.array(syst_dw)
         
-        syst_uncert_up = np.sqrt(np.sum(np.power(syst_up,2), axis=0) + np.power(pred_stat_error,2))
-        syst_uncert_dw = np.sqrt(np.sum(np.power(syst_dw,2), axis=0) + np.power(pred_stat_error,2))
-        
-        bx.bar( 
-               x_vals, 
-               height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
-               width  = (r_edge - l_edge) / len(x_vals),
-               bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
-               color  = "blue", alpha  = 0.2, zorder = 0,
-               label="stat+syst"
-        )
+        if bx is not None:
+            syst_up = np.array(syst_up)
+            syst_dw = np.array(syst_dw)
+
+            syst_uncert_up = np.sqrt(np.sum(np.power(syst_up,2), axis=0) + np.power(pred_stat_error,2))
+            syst_uncert_dw = np.sqrt(np.sum(np.power(syst_dw,2), axis=0) + np.power(pred_stat_error,2))
+
+            bx.bar(
+                x_vals,
+                height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
+                width  = (r_edge - l_edge) / len(x_vals)
+                bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
+                color  = "blue", alpha  = 0.2, zorder = 0,
+                label="stat+syst"
+            )
     
     if isinstance(pred, hist.Hist):
         if proc_axis_name in pred.axes.name:
@@ -303,7 +311,8 @@ def mcplot(
     if combine_fit != "pre-combine" and combine_histo_edges is not None:
         # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
         assert len(combine_histo_edges) == len(bx.get_xticks()), f"mismatch of edges({combine_histo_edges}) and xticks({bx.get_xticks()})"
-        bx.set_xticks(bx.get_xticks(), labels=combine_histo_edges)
+        if bx is not None:
+            bx.set_xticks(bx.get_xticks(), labels=combine_histo_edges)
     fit_label = {"pre-combine": "Prefit", "prefit": "Prefit", "fit_b": "Postfit (background only)", "fit_s": "Postfit (s+b)"}[combine_fit]
     # ax.text(
     #     0.02, 0.05, fit_label,
@@ -313,9 +322,10 @@ def mcplot(
     #     transform=ax.transAxes
     # )
     ax.legend(ncol=2, loc='upper right', fontsize=15)
-    bx.legend(loc='upper right', fontsize=15)
-    bx.set_xlabel(pred_ksum.axes[0].label)
-    bx.set_ylabel('data/mc')
+    if bx is not None:
+        bx.legend(loc='upper right', fontsize=15)
+        bx.set_xlabel(pred_ksum.axes[0].label)
+        bx.set_ylabel('data/mc')
     ax.set_ylabel('events')
     
     return ax, bx
@@ -327,6 +337,7 @@ def check_systematic(
     plot_file_name: str = 'check-sys',
     output_dir: str = './systematic-check/',
     xrange: List = [],
+    no_ratios: bool = False,
     **kwargs) -> Any:
     # inspired from boost Hist
     
@@ -338,8 +349,8 @@ def check_systematic(
         
     pred_values = pred.values(0)   
     x_vals = pred.axes.centers[0]
-    l_edge = pred.axes.edges[0][0]
-    r_edge = pred.axes.edges[-1][-1]
+    l_edge = pred_ksum.axes.edges[0][0]
+    r_edge = pred_ksum.axes.edges[-1][-1]
     
     pred_stat_error = np.sqrt(pred.values(0))
    
@@ -357,7 +368,7 @@ def check_systematic(
             
             # drawing the plots
             fig = plt.figure(figsize=(6,7))
-            ax, bx = make_split(0.7)
+            ax, bx = make_split(1 if no_ratios else 0.7)
             
             ax.set_title(f'{plot_file_name} : {s}')
             pred.plot(ax=ax, color='black', histtype='step', label='nominal')
@@ -384,48 +395,49 @@ def check_systematic(
                 edgecolor="gray",
                 hatch=4 * "/",
             )
-            bx.axhline(
-                1, color="black", linestyle="dashed", linewidth=1.0
-            )
-            bx.bar( 
-                x_vals, 
-                height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
-                width  = (r_edge - l_edge) / len(x_vals),
-                bottom = np.divide(pred_values - pred_stat_error, pred_values, where=pred_values!=0),
-                color  = "grey",
-                alpha  = 0.4,
-            )
-            
-            bx.hist(
-                x_vals, bins=pred.axes[0].edges,
-                weights=np.divide(syst_uncert_up, pred_values, where=pred_values!=0), 
-                lw=1.5,
-                color='red', histtype='step', 
-                label='Up'
-            )
-            bx.hist(
-                x_vals, bins=pred.axes[0].edges,
-                weights= np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
-                lw=1.5,
-                color='blue', histtype='step', 
-                label='Down'
-            )
-            
             ax.set_xlim(l_edge, r_edge)
-            bx.set_ylim([0.4,1.6])
             ax.legend(ncol=2, loc='upper right')
-            bx.set_xlabel(pred.axes[0].label)
-            bx.set_ylabel('data/mc')
             ax.set_ylabel('events')
             ax.set_yscale('log')
+
+            if bx is not None:
+                bx.axhline(
+                    1, color="black", linestyle="dashed", linewidth=1.0
+                )
+                bx.bar(
+                    x_vals,
+                    height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
+                    width  = (r_edge - l_edge) / len(x_vals),
+                    bottom = np.divide(pred_values - pred_stat_error, pred_values, where=pred_values!=0),
+                    color  = "grey",
+                    alpha  = 0.4,
+                )
+
+                bx.hist(
+                    x_vals, bins=pred.axes[0].edges,
+                    weights=np.divide(syst_uncert_up, pred_values, where=pred_values!=0),
+                    lw=1.5,
+                    color='red', histtype='step',
+                    label='Up'
+                )
+                bx.hist(
+                    x_vals, bins=pred.axes[0].edges,
+                    weights= np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
+                    lw=1.5,
+                    color='blue', histtype='step',
+                    label='Down'
+                )
+                bx.set_ylim([0.4,1.6])
+                bx.set_xlabel(pred.axes[0].label)
+                bx.set_ylabel('data/mc')
             
-            if len(xrange) > 0:
-                bx.set_xlim(xrange)
+                if len(xrange) > 0:
+                    bx.set_xlim(xrange)
             
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.pdf')
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.png')
 
-def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, remap_replacement_types = None, 
+def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True, remap_replacement_types = None, no_ratios=False,
              combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
     assert combine_fit in ["pre-combine", "prefit", "fit_b", "fit_s"]
     if remap_replacement_types is None:
@@ -514,16 +526,17 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     else:
         _plot_channel = dctools.dict_to_hist_axis(datasets, axis_name='process', axis_label=None, axis_type = 'StrCategory')
         combine_uncertainty_histo = combine_uncertainty_histo.project('systematic', variable)
-    pred = _plot_channel.project('process', 'systematic', variable)[:hist.loc('data'),:,:]   
+    pred = _plot_channel.project('process', 'systematic', variable)[:hist.loc('data'),:,:]
     data = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('data'),:]
     
 
-    plt.figure(figsize=(6,7))
+    plt.figure(figsize=(6, 4.9 if no_ratios else 7))
     ax, bx = plotter.mcplot(
         pred[{'systematic':'nominal'}].stack('process'),
         data=None if blind else data,
         syst=pred.stack('process'),
         colors = color_cycle,
+        no_ratios=no_ratios,
         combine_fit=combine_fit,
         combine_uncertainty_histo=combine_uncertainty_histo[{'systematic':'nominal'}] if combine_uncertainty_histo else None,
         combine_histo_edges=edges,
@@ -540,9 +553,10 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
         sig_qcd.plot(ax=ax, histtype='step', color='purple')
     except:
         pass
-    bx.set_ylim([0.1, 1.9])
-    if len(xlim) > 0:
-        bx.set_xlim(xlim)
+    if bx is not None:
+        bx.set_ylim([0.1, 1.9])
+        if len(xlim) > 0:
+            bx.set_xlim(xlim)
     ax.set_title(f"channel {combine_channel_group or channel}: {combine_era or era}")
     hep.cms.label("", ax=ax, data=not blind, lumi=combine_lumi, year=combine_era or int(era)) #add lumi=lumi, add year=int(era) with handling of APV, etc.
     ax.set_yscale('log')
@@ -560,7 +574,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
             pred[{'systematic':'nominal'}].stack('process'),
             syst=pred.stack('process'),
             plot_file_name=f'check-sys-{channel}-{era}', 
-            xrange=xlim
+            xrange=xlim,
+            no_ratios=no_ratios,
         )
         plt.clf()
     return _plot_channel, datasets
