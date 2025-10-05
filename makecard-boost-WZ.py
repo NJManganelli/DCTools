@@ -205,14 +205,14 @@ def main():
         if not card.add_nominal(p.name, p.get("nominal"), p.ptype): continue
         year = options.era.replace('APV','')
         
-        # luminausity
+        # luminosity
         # card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
         if options.era in ["2016", "2017", "2018"]:
             card.add_log_normal(p.name, f"CMS_lumi_{options.era}", getattr(config.luminosity, f"uncer_lumi_{options.era}"))
             card.add_log_normal(p.name, f"CMS_lumi_13TeV_1718", getattr(config.luminosity, f"uncer_lumi_13TeV_1718"))
             card.add_log_normal(p.name, f"CMS_lumi_13TeV_correlated", getattr(config.luminosity, f"uncer_lumi_13TeV_correlated"))
         else:
-            raise NotImplementedError("non-Run2 Lmunisoty uncertainties not implemented yet")
+            raise NotImplementedError("non-Run2 Luminosity uncertainties not implemented yet")
 
         if p.remap_replace_group_name is not None:
             # If we later decide to add shape nuisances to e.g. datadriven estimates, we'll need to eliminate or alter this code path
