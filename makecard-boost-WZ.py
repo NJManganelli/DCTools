@@ -69,7 +69,7 @@ def main():
     parser.add_argument("-s"  , "--signal"  , nargs='+', type=str)
     parser.add_argument('-n'  , "--name"    , type=str , default='')
     parser.add_argument('-p'  , "--plot"    , action="store_true")
-    parser.add_argument('--rebin', type=int, default=1, help='rebin')
+    parser.add_argument('--rebin', type=int, nargs='+', default=None, help='rebin card by integer value or list of bin groups')
     parser.add_argument("--bins",
             type=lambda s: [float(item) for item in s.split(',')],
             help='input a comma separated list. ex: --bins="-1.2,0,1.2"'
@@ -102,6 +102,13 @@ def main():
                 config.boosthist.items()
             )
         )
+        v_cfg = config.plotting[options.channel][options.variable]
+        if options.rebin is not None:
+            rebin = options.rebin
+        elif "rebin" in v_cfg:
+            rebin = v_cfg.rebin
+        else:
+            rebin = 1
 
         p = dctools.datagroup(
             histograms = histograms,
@@ -111,7 +118,7 @@ def main():
             xsections  = config.xsections,
             channel    = options.channel,
             luminosity = config.luminosity.value,
-            rebin      = options.rebin,
+            rebin      = rebin,
             remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
             # era        = options.era,
         )
