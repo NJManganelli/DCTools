@@ -440,16 +440,18 @@ class datagroup:
 
     def get(self, systvar) -> hist.Hist:
         shapeUp, shapeDown = None, None
+        # workaround https://github.com/scikit-hep/hist/issues/639
+        projection_name = self.observable if self.observable in self.stacked.axes.name else ""
         if "nominal" in systvar:
-            return self.stacked[{'systematic': systvar}].project(self.observable)
+            return self.stacked[{'systematic': systvar}].project(projection_name)
         else:
             try:
                 shapeUp = self.stacked[
                     {'systematic': systvar + 'Up'}
-                ].project(self.observable)
+                ].project(projection_name)
                 shapeDown = self.stacked[
                     {'systematic': systvar + 'Down'}
-                ].project(self.observable)
+                ].project(projection_name)
                 return (shapeUp, shapeDown)
             except ValueError:
                 print(f'{systvar} is not present in the boost histogram')
