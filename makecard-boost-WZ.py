@@ -109,6 +109,8 @@ def main():
             rebin = v_cfg.rebin
         else:
             rebin = 1
+        if isinstance(rebin, list) and len(rebin) < 2:
+            rebin = rebin[0]
 
         p = dctools.datagroup(
             histograms = histograms,
