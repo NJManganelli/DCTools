@@ -561,6 +561,7 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
         syst=pred.stack('process'),
         colors = color_cycle,
         no_ratios=no_ratios,
+        bin_width_norm=bin_width_norm,
         combine_fit=combine_fit,
         combine_uncertainty_histo=combine_uncertainty_histo[{'systematic':'nominal'}] if combine_uncertainty_histo else None,
         combine_histo_edges=edges,
@@ -591,7 +592,6 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     rrt_postfix = "-" + "-".join(remap_replacement_types) if (isinstance(remap_replacement_types, list) and len(remap_replacement_types) > 0 and not (len(remap_replacement_types) == 1 and remap_replacement_types[0] == "nothing")) else ""
     nrat_postfix = "-noratio" if no_ratios else ""
     gbwn_postfix = f"-binwnorm{bin_width_norm}".replace(".", "p") if bin_width_norm is not None else ""
-    print(gbwn_postfix)
     #xlim_postfix = f"-xlim{int(xlim[0])}-{int(xlim[1])}" if len(xlim) == 2 else ""
     plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.pdf')
     plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.png')
