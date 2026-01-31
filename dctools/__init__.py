@@ -750,7 +750,7 @@ class datacard:
             line_ = "{0:<10}".format(nuisance)
             for process, _, _ in self.rates:
                 if process in scale:
-                    line_ += "{0:>15}".format("%.3f" % scale[process])
+                    line_ += "{0:>15}".format("%.4f" % scale[process])
                 else:
                     line_ += "{0:>15}".format("-")
             self.dc_file.append(line_)
