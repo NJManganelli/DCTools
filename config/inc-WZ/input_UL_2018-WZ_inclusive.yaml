@@ -12,18 +12,19 @@ luminosity:
   # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0
   value: 59.83
   # uncertainties with correlation breakdown from https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2
+  # Use null where no values are supposed to be inserted ("-")
   # 2016 block
-  # uncer_lumi_2016: 1.0
-  # uncer_lumi_13TeV_1718: 0.0
-  # uncer_lumi_13TeV_correlated: 0.6
+  # uncer_lumi_13TeV_1516_l: 1.0118
+  # uncer_lumi_13TeV_151617_l: 1.0004
+  # uncer_lumi_13TeV_15161718_l: 1.0035
   # 2017 block
-  # uncer_lumi_2017: 2.0
-  # uncer_lumi_13TeV_1718: 0.6
-  # uncer_lumi_13TeV_correlated: 0.9
+  # uncer_lumi_13TeV_1516_l: null
+  # uncer_lumi_13TeV_151617_l: 1.0055
+  # uncer_lumi_13TeV_15161718_l: 1.0061
   # 2018 block
-  uncer_lumi_2018: 1.5
-  uncer_lumi_13TeV_1718: 0.2
-  uncer_lumi_13TeV_correlated: 2.0
+  uncer_lumi_13TeV_1516_l: null
+  uncer_lumi_13TeV_151617_l: null
+  uncer_lumi_13TeV_15161718_l: 1.0084
 
 groups:
   WW:
