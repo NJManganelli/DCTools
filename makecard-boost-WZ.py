@@ -11,6 +11,7 @@ from dctools import plot as plotter
 from typing import Any, IO
 import numpy as np
 import rich
+import warnings
 
 class config_input:
     def __init__(self, cfg):
@@ -206,11 +207,35 @@ def main():
         year = options.era.replace('APV','')
         
         # luminosity
-        # card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
         if options.era in ["2016", "2017", "2018"]:
-            card.add_log_normal(p.name, f"CMS_lumi_{options.era}", getattr(config.luminosity, f"uncer_lumi_{options.era}"))
-            card.add_log_normal(p.name, f"CMS_lumi_13TeV_1718", getattr(config.luminosity, f"uncer_lumi_13TeV_1718"))
-            card.add_log_normal(p.name, f"CMS_lumi_13TeV_correlated", getattr(config.luminosity, f"uncer_lumi_13TeV_correlated"))
+            try:
+                card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
+                warnings.warn("Old style single-lumi uncertainty detected, please update to uncer_<lumi_uncertainty>"
+                              "\n where <lumi_uncertainty> is one of lumi_13TeV_1516_l, lumi_13TeV_151617_l, lumi_13TeV_15161718_l"
+                              "\n See https://twiki.cern.ch/twiki/bin/viewauth/CMS/LumiRecommendationsRun2 for more details")
+            except Exception as e:
+                pass
+            try:
+                card.add_log_normal(p.name, f"CMS_lumi_{options.era}", getattr(config.luminosity, f"uncer_lumi_{options.era}"))
+                card.add_log_normal(p.name, f"CMS_lumi_13TeV_1718", getattr(config.luminosity, f"uncer_lumi_13TeV_1718"))
+                card.add_log_normal(p.name, f"CMS_lumi_13TeV_correlated", getattr(config.luminosity, f"uncer_lumi_13TeV_correlated"))
+                warnings.warn("Old style lumi uncertainty detected, please update to uncer_<lumi_uncertainty>"
+                              "\n where <lumi_uncertainty> is one of lumi_13TeV_1516_l, lumi_13TeV_151617_l, lumi_13TeV_15161718_l"
+                              "\n See https://twiki.cern.ch/twiki/bin/viewauth/CMS/LumiRecommendationsRun2 for more details")
+            except Exception as e:
+                pass
+            try:
+                lumi1516 = getattr(config.luminosity, f"uncer_lumi_13TeV_1516_l")
+                lumi151617 = getattr(config.luminosity, f"uncer_lumi_13TeV_151617_l")
+                lumi15161718 = getattr(config.luminosity, f"uncer_lumi_13TeV_15161718_l")
+                if lumi1516 is not None:
+                    card.add_log_normal(p.name, f"CMS_lumi_13TeV_1516_l", lumi1516)
+                if lumi151617 is not None:
+                    card.add_log_normal(p.name, f"CMS_lumi_13TeV_151617_l", lumi151617)
+                if lumi15161718 is not None:
+                    card.add_log_normal(p.name, f"CMS_lumi_13TeV_15161718_l", lumi15161718)
+            except Exception as e:
+                pass
         else:
             raise NotImplementedError("non-Run2 Luminosity uncertainties not implemented yet")
 
