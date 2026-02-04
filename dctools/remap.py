@@ -9,17 +9,18 @@ class inc_WZ_DataDrivenDY:
             "inc-D1": ("DY", "validation"),
             "inc-SR0": ("DY", "datadriven"),
             "inc-SR1": ("DY", "datadriven"),
+            "inc-SR01": ("DY", "datadriven"),
         }
         assert all([chan in mapping.keys() for chan in inc_WZ_DataDrivenDY.expected_channels(dc_instance)]), f"In {__class__.__name__}, not all expected channels are found in the replaces_group_and_type method: {mapping.keys()}"
         return mapping
 
     @staticmethod
     def expected_channels(dc_instance):
-        return ['inc-D0', 'inc-SR0', 'inc-D1', 'inc-SR1',]
+        return ['inc-D0', 'inc-SR0', 'inc-D1', 'inc-SR1', 'inc-SR01',]
 
     @staticmethod
     def expected_systvars(dc_instance):
-        return ["nominal"]
+        return ["nominal", "DDDYUp", "DDDYDown"]
     
     @staticmethod
     def expected_channels_systvars(dc_instance):
@@ -36,14 +37,17 @@ class inc_WZ_DataDrivenDY:
         # Simultaneously maps the expected systvar to the name generated while filling histograms
         # Simple mapping, channel-to-channel and systvar-to-systvar, but by mapping together we can accommodate a region-specific systematic remapping too
         channel_dict = {
-            # maps the expected channel (i.e. for analysis) to the original filled channel (i.e. SR0:nominal pulls from B0:datadriven-DYUp in data for the data-driven DY estimate)
+            # maps the expected channel (i.e. for analysis) to the original filled channel (i.e. SR0:nominal pulls from B0:datadriven-DDDYNominalUp in data for the data-driven DY estimate)
             "inc-SR0": "inc-B0",
             "inc-SR1": "inc-B1",
+            "inc-SR01": "inc-B01",
             "inc-D0": "inc-C0",
             "inc-D1": "inc-C1",
         }
         syst_dict = {
-            "nominal": "datadriven_DYUp",
+            "nominal": "datadriven_DDDYNominalUp",
+            "DDDYUp": "datadriven_DDDYUp",
+            "DDDYDown": "datadriven_DDDYDown",
         }
         assert (expected_channel, expected_systvar) in inc_WZ_DataDrivenDY.expected_channels_systvars(None), f"In {__class__.__name__}, the expected (channel, systvar) pair ({expected_channel}, {expected_systvar}) is not found in the permitted expected_channels_systvars ({inc_WZ_DataDrivenDY.expected_channels_systvars(None)})"
         #assert expected_systvar in expected_systvars(None), f"In {__class__.__name__}, expected_systvar {expected_systvar} not found in permitted expected_systvars ({expected_systvars(None)})"
