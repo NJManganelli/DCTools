@@ -1,29 +1,20 @@
 #!/bin/sh
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2018-WZ_inclusive.yaml --era 2018 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR0 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2018-WZ_inclusive.yaml --era 2018 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR1 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2018-WZ_inclusive.yaml --era 2018 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY0 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2018-WZ_inclusive.yaml --era 2018 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY1 
 
-#python makecard-boost.py --name VBS --input ./config/input_UL_2018-adrianople-all.yaml --era 2018 --variable gnn_score --channel  vbs-DY  --rebin=10 
-#python makecard-boost.py --name VBS --input ./config/input_UL_2018-adrianople-all.yaml --era 2018 --variable gnn_score --channel  vbs-TT  --rebin=10
-python makecard-boost.py --name VBS --input ./config/input_UL_2018-adrianople-all.yaml --era 2018 --variable gnn_score --channel  vbs-EM  --rebin=10 --dd=False 
-python makecard-boost.py --name VBS --input ./config/input_UL_2018-adrianople-all.yaml --era 2018 --variable gnn_score --channel  vbs-3L  --rebin=10 --dd=False
-python makecard-boost.py --name VBS --input ./config/input_UL_2018-edirne-allDY-SR.yaml --era 2018 --variable gnn_flat  --channel  vbs-SR  --rebin=10 --dd=True
-#python makecard-boost.py --name VBS --input ./config/input_UL_2018-adrianople-all.yaml --era 2018 --variable gnn_flat  --channel  vbs-SR  --rebin=10 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2017-WZ_inclusive.yaml --era 2017 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR0 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2017-WZ_inclusive.yaml --era 2017 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR1 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2017-WZ_inclusive.yaml --era 2017 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY0 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2017-WZ_inclusive.yaml --era 2017 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY1 
 
-python makecard-boost.py --name VBS --input ./config/input_UL_2017-adrianople-all.yaml --era 2017 --variable gnn_score --channel  vbs-EM  --rebin=10 --dd=False
-#python makecard-boost.py --name VBS --input ./config/input_UL_2017-adrianople-all.yaml --era 2017 --variable gnn_score --channel  vbs-TT  --rebin=10 
-#python makecard-boost.py --name VBS --input ./config/input_UL_2017-adrianople-all.yaml --era 2017 --variable gnn_score --channel  vbs-DY  --rebin=10 
-python makecard-boost.py --name VBS --input ./config/input_UL_2017-adrianople-all.yaml --era 2017 --variable gnn_score --channel  vbs-3L  --rebin=10 --dd=False
-python makecard-boost.py --name VBS --input ./config/input_UL_2017-edirne-allDY-SR.yaml --era 2017 --variable gnn_flat  --channel  vbs-SR  --rebin=10 --dd=True
-#python makecard-boost.py --name VBS --input ./config/input_UL_2017-adrianople-all.yaml --era 2017 --variable gnn_flat  --channel  vbs-SR  --rebin=10 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016-WZ_inclusive.yaml --era 2016 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR0 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016-WZ_inclusive.yaml --era 2016 --variable dilep_tau_loose_met_hadron_mt --channel inc-SR1 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016-WZ_inclusive.yaml --era 2016 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY0 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016-WZ_inclusive.yaml --era 2016 --variable dilep_tau_loose_met_hadron_mt --channel inc-DY1 
 
-python makecard-boost.py --name VBS --input ./config/input_UL_2016-adrianople-all.yaml --era 2016 --variable gnn_score --channel  vbs-EM  --rebin=10 --dd=False
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016-adrianople-all.yaml --era 2016 --variable gnn_score --channel  vbs-TT  --rebin=10
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016-adrianople-all.yaml --era 2016 --variable gnn_score --channel  vbs-DY  --rebin=10
-python makecard-boost.py --name VBS --input ./config/input_UL_2016-adrianople-all.yaml --era 2016 --variable gnn_score --channel  vbs-3L  --rebin=10 --dd=False
-python makecard-boost.py --name VBS --input ./config/input_UL_2016-edirne-allDY-SR.yaml --era 2016 --variable gnn_flat  --channel  vbs-SR  --rebin=10 --dd=True
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016-adrianople-all.yaml --era 2016 --variable gnn_flat  --channel  vbs-SR  --rebin=10
-
-python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-adrianople-all.yaml --era 2016APV --variable gnn_score --channel  vbs-EM  --rebin=10 --dd=False
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-adrianople-all.yaml --era 2016APV --variable gnn_score --channel  vbs-TT  --rebin=10
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-adrianople-all.yaml --era 2016APV --variable gnn_score --channel  vbs-DY  --rebin=10
-python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-adrianople-all.yaml --era 2016APV --variable gnn_score --channel  vbs-3L  --rebin=10 --dd=False
-python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-edirne-allDY-SR.yaml --era 2016APV --variable gnn_flat  --channel  vbs-SR  --rebin=10 --dd=True
-#python makecard-boost.py --name VBS --input ./config/input_UL_2016APV-adrianople-all.yaml --era 2016APV --variable gnn_flat  --channel  vbs-SR  --rebin=10
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016APV-WZ_inclusive.yaml --era 2016APV --variable dilep_tau_loose_met_hadron_mt --channel inc-SR0 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016APV-WZ_inclusive.yaml --era 2016APV --variable dilep_tau_loose_met_hadron_mt --channel inc-SR1 -rrt datadriven
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016APV-WZ_inclusive.yaml --era 2016APV --variable dilep_tau_loose_met_hadron_mt --channel inc-DY0 
+python makecard-boost-WZ.py --name WZ_had --input ./config/inc-WZ/input_UL_2016APV-WZ_inclusive.yaml --era 2016APV --variable dilep_tau_loose_met_hadron_mt --channel inc-DY1 
