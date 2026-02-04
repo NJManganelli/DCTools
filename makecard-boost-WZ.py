@@ -216,7 +216,7 @@ def main():
         
         # luminosity
         # card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
-        if options.era in ["2016", "2017", "2018"]:
+        if options.era in ["2016", "2016APV", "2017", "2018"]:
             card.add_log_normal(p.name, f"CMS_lumi_{options.era}", getattr(config.luminosity, f"uncer_lumi_{options.era}"))
             card.add_log_normal(p.name, f"CMS_lumi_13TeV_1718", getattr(config.luminosity, f"uncer_lumi_13TeV_1718"))
             card.add_log_normal(p.name, f"CMS_lumi_13TeV_correlated", getattr(config.luminosity, f"uncer_lumi_13TeV_correlated"))
@@ -228,14 +228,14 @@ def main():
             rich.print(f"[red]Skipping shape nuisances for [green]{p.name} (remap_original_group_name={p.remap_original_group_name})")
         else:
             # scale factors / resolution
-            card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=True)
-            card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=True)
-            card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}"  , p.get("TauEn")   , symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}"  , p.get("TauEn")   , symmetrise=False)
             card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
             card.add_shape_nuisance(p.name, f"CMS_trig_sf_{options.era}", p.get("triggerSF") , symmetrise=False)
 
             # JES/JES and UEPS
-            card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False)
+            # card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False)
 
             card.add_shape_nuisance(p.name, f"JES_Absolute{year}"      , p.get(f"JES_Absolute{year}")      , symmetrise=False)
             card.add_shape_nuisance(p.name, f"JES_BBEC1{year}"         , p.get(f"JES_BBEC1{year}")         , symmetrise=False)
