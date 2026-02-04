@@ -41,7 +41,8 @@ DY2JetsToLL_M-50_LHEZpT_50-150_TuneCP5_13TeV-amcnloFXFX-pythia8:
 DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
-  xsec: 6077.22
+  xsec: 6077.22 
+  # NNLO QCD + NLO EWK
 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8: 
   br: 1.0
   kr: 1.0
@@ -383,18 +384,31 @@ DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-p
   br: 1.0
   kr: 1.0
   xsec: 583
+# NNLO to NLO k factor normalizing to total cross section 6077.22 for 0, 1, and 2 jet binned DY sample 0.94339 for 2016 and 0.94556 for 2017. Currently, the xsec values are based on 2017 UL
 DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
-  kr: 1.0
-  xsec: 5129
+  kr: 0.94556 
+  xsec: 5090
 DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
-  kr: 1.0
-  xsec: 951.5
+  kr: 0.94556
+  xsec: 983.5
 DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
-  kr: 1.0
-  xsec: 361.4
+  kr: 0.94556
+  xsec: 353.6
+# DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+#   br: 1.0
+#   kr: 0.94339
+#   xsec: 5129
+# DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+#   br: 1.0
+#   kr: 0.94339
+#   xsec: 951.5
+# DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+#   br: 1.0
+#   kr: 0.94339
+#   xsec: 361.4
 DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8:
   br: 1.0
   kr: 1.0
