@@ -75,11 +75,14 @@ def main():
     parser.add_argument('-ctu', "--combine_total_uncertainty", type=str, default="total_background")
     parser.add_argument('-ccg', "--combine_channel_groups", nargs="*", type=str, default=None)
     parser.add_argument('-ccgb', "--combine_channel_group_blindings", nargs="*", type=bool, default=[False])
+    parser.add_argument('--logx', action="store_true", help="make x axis in log scale")
 
     options = parser.parse_args()
     config = dctools.read_config(options.input)
 
     if options.combine_fit in ["prefit", "fit_b", "fit_s"]:
+        if options.logx:
+            raise NotImplementedError("logx not yet implemented for combine plotting")
         # for combine plotting, for the prefit, background-only fit, or signal + background fit
         do_channels = (isinstance(options.channels, list) and len(options.channels) > 0)
         do_groups = (isinstance(options.combine_channel_groups, list) and len(options.combine_channel_groups) > 0)
@@ -100,6 +103,7 @@ def main():
                                  blind = blind,
                                  era = options.era,
                                  remap_replacement_types = options.remap_replacement_types,
+                                 logx=options.logx,
                                  bin_width_norm = options.global_bin_width_norm,
                                  no_ratios = options.no_ratios,
                                  checksyst = False,
@@ -121,6 +125,7 @@ def main():
                                  blind = group_blind,
                                  #era = options.era, #picked up from configuration automatically
                                  remap_replacement_types = options.remap_replacement_types, # may not be needed/used
+                                 logx=options.logx,
                                  bin_width_norm = options.global_bin_width_norm,
                                  no_ratios = options.no_ratios,
                                  checksyst = False,
@@ -138,12 +143,16 @@ def main():
                 if options.variables and len(options.variables) > 0 and vname not in options.variables:
                     continue
                 v_cfg = ch_cfg[vname]
+                config_logx = v_cfg.logx if "logx" in v_cfg else False
+                if options.logx :
+                    config_logx = True #if the command line option is true overwrite it
                 _ = plotting(config, vname, channel,
                              rebin = v_cfg.rebin,
                              xlim = v_cfg.range,
                              blind = v_cfg.blind,
                              era = options.era,
                              remap_replacement_types = options.remap_replacement_types,
+                             logx=config_logx,
                              bin_width_norm = options.global_bin_width_norm,
                              no_ratios = options.no_ratios,
                              checksyst = options.checksyst,
