@@ -1,8 +1,6 @@
 boosthist:
-  # - ./data/merged-histogram-WZ-2018-Inc_WZ_lateset_dd.pkl.gz
-  # - ./data/merged-histogram-WZ-2018-Inc_WZ_latest_DD_generic_had_mT_latest.pkl.gz
+  # - ./data/merged-histogram-WZ-2017-Inc_WZ_latest_DD_generic_had_mT_latest.pkl.gz
   - ./data/merged-histogram-WZ-2018-Inc_WZ_lateset_alltau_jet_separation.pkl.gz
-  # - ./data/merged-histogram-WZ-2018-Inc_WZ_l_and_b_jet_separation.pkl.gz
   
     
 xsections:
@@ -10,20 +8,13 @@ xsections:
 
 luminosity:
   # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0
-  value: 59.83
+  value: 41.48
   # uncertainties with correlation breakdown from https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2
-  # 2016 block
-  # uncer_lumi_2016: 1.0
-  # uncer_lumi_13TeV_1718: 0.0
-  # uncer_lumi_13TeV_correlated: 0.6
   # 2017 block
-  # uncer_lumi_2017: 2.0
-  # uncer_lumi_13TeV_1718: 0.6
-  # uncer_lumi_13TeV_correlated: 0.9
-  # 2018 block
-  uncer_lumi_2018: 1.5
-  uncer_lumi_13TeV_1718: 0.2
-  uncer_lumi_13TeV_correlated: 2.0
+  uncer_lumi_2017: 2.0
+  uncer_lumi_13TeV_1718: 0.6
+  uncer_lumi_13TeV_correlated: 0.9
+  
 
 groups:
   WW:
@@ -90,15 +81,12 @@ groups:
     processes:
       - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
       - ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
-      # - ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/.root
-      # - ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8
       - ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8
       - ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8
       - ST_t-channel_top_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8
       - tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8
       - TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
       - TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
-      # - TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
       - TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8
       - TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8
       - TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8
@@ -155,7 +143,8 @@ groups:
       - MuonEG
       - DoubleMuon
       - SingleMuon
-      - EGamma
+      - DoubleEG
+      - SingleMuon
     type:
       background
     color:
@@ -170,25 +159,13 @@ groups:
       signal
     color:
       "#46B3A5"
-  # DDDY:
-  #   processes:
-  #     - MuonEG
-  #     - DoubleMuon
-  #     - SingleMuon
-  #     - EGamma
-  #   type:
-  #     background
-  #   color:
-  #     # "#2E8B57"
-  #     "#808080"
-  #   remap_class_name:
-  #     inc_WZ_DataDrivenDY
   data:
     processes:
       - MuonEG
       - DoubleMuon
       - SingleMuon
-      - EGamma
+      - DoubleEG
+      - SingleMuon
     type:
       data
     color:
@@ -196,7 +173,7 @@ groups:
 
 plotting:
     inc-DY0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 600]
             blind: false
@@ -209,9 +186,7 @@ plotting:
             range: [60, 120]
             blind: false
         dilep_tau_loose_met_hadron_mt:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
-            # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-            # rebin: 1
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
             range: [0, 1500]
             blind: false
         mT_WZ:
@@ -224,19 +199,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
-            blind: false
-        tau_pt_loose:
-            rebin: 2 
-            range: [0, 300]
-            blind: false
-        tau_phi_loose:
-            rebin: 2 
-            range: [0, 300]
-            blind: false
-        tau_pt:
-            rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         dphi_met_ll:
             rebin: 1
@@ -251,7 +214,7 @@ plotting:
             range: [1, 5]
             blind: false
     inc-DY1:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 300]
             blind: false
@@ -260,8 +223,7 @@ plotting:
             range: [0, 300]
             blind: false
         dilep_tau_loose_met_hadron_mt:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
-            # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
             range: [0, 1500]
             blind: false
         mT_WZ:
@@ -278,11 +240,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
-            blind: false
-        tau_pt_loose:
-            rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         dphi_met_ll:
             rebin: 1
@@ -301,7 +259,7 @@ plotting:
             range: [0, 300]
             blind: false
     inc-EM0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 300]
             blind: false
@@ -319,7 +277,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         dphi_met_ll:
             rebin: 1
@@ -334,7 +292,7 @@ plotting:
             range: [1, 5]
             blind: false
     inc-EM1:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 300]
             blind: false
@@ -352,7 +310,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         dphi_met_ll:
             rebin: 1
@@ -372,7 +330,7 @@ plotting:
             blind: false
 
     inc-SR0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 4
             range: [0, 1000]
             blind: true
@@ -381,7 +339,6 @@ plotting:
             range: [0, 300]
             blind: true
         dilep_tau_loose_met_hadron_mt:
-            # rebin: 1
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
             range: [0, 1500]
             blind: true
@@ -403,7 +360,7 @@ plotting:
             blind: true
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: true
         tau_pt:
             rebin: 2 
@@ -433,18 +390,6 @@ plotting:
             rebin: 1
             range: [1, 2.5]
             blind: true
-        tau_pt_loose:
-            rebin: 2 
-            range: [0, 300]
-            blind: true
-        taus_phi_loose:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
-        taus_eta_loose:
-            rebin: 1
-            range: [0, 2.5]
-            blind: true
         dilep_dphi_tau:
             rebin: 1
             range: [1, 3.14159]
@@ -469,282 +414,109 @@ plotting:
             rebin: 1
             range: [0, 1]
             blind: true
-        nbjets:
-            rebin: 1
-            range: [0, 5]
+    inc-SR1:
+        dilep_mt:
+            rebin: 4
+            range: [0, 1000]
             blind: true
-        njets:
-            rebin: 1
-            range: [0, 5]
+        dilep_tau_loose_met_hadron_mt:
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            range: [0, 1500]
             blind: true
-        ntaus_loose:
+        m_T_WZ:
             rebin: 1
-            range: [0, 5]
+            range: [0, 600]
             blind: true
-        ntaus_tight:
-            rebin: 1
-            range: [0, 5]
+        mT_WZ:
+            rebin: [30, 30, 30, 60]
+            range: [0, 1500]
             blind: true
-        ntaus_vtight:
+        inv_m_WZ:
+            rebin: [30, 30, 30, 60]
+            range: [0, 1500]
+            blind: true
+        baseweight:
+            rebin: 1 
+            range: [-30, 30]
+            blind: true
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        lead_jet_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: true
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: true
+        tau_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        taus_phi:
             rebin: 1
-            range: [0, 5]
-            blind: true  
-    # inc-SR1l:
-    #     dilep_mt_llnunu:
-    #         rebin: 4
-    #         range: [0, 1000]
-    #         blind: true
-    #     dilep_tau_loose_met_hadron_mt:
-    #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-    #         range: [0, 1500]
-    #         blind: true
-    #     m_T_WZ:
-    #         rebin: 1
-    #         range: [0, 600]
-    #         blind: true
-    #     mT_WZ:
-    #         rebin: [30, 30, 30, 60]
-    #         range: [0, 1500]
-    #         blind: true
-    #     inv_m_WZ:
-    #         rebin: [30, 30, 30, 60]
-    #         range: [0, 1500]
-    #         blind: true
-    #     baseweight:
-    #         rebin: 1 
-    #         range: [-30, 30]
-    #         blind: true
-    #     dilep_pt:
-    #         rebin: 3 
-    #         range: [0, 300]
-    #         blind: true
-    #     lead_jet_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     dilep_m:
-    #         rebin: 2 
-    #         range: [60, 120]
-    #         blind: true
-    #     met_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     tau_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     taus_phi:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     taus_eta:
-    #         rebin: 1
-    #         range: [0, 2.5]
-    #         blind: true
-    #     tau_pt_loose:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     taus_phi_loose:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     taus_eta_loose:
-    #         rebin: 1
-    #         range: [0, 2.5]
-    #         blind: true
-    #     dphi_met_ll:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_tau_met_phi:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     dilep_dphi:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     dilep_dphi_tau:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     dphi_jet_met:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R:
-    #         rebin: 1
-    #         range: [0, 3.5]
-    #         blind: true
-    #     dilep_dR:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R_jet_dilep:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R_jet_tau:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     deep_tau_jet:
-    #         rebin: 1
-    #         range: [0.8, 1.2]
-    #         blind: true
-    #     deep_tau_e:
-    #         rebin: 1
-    #         range: [0, 1]
-    #         blind: true
-    #     deep_tau_mu:
-    #         rebin: 1
-    #         range: [0, 1]
-    #         blind: true
-    #     nbjets:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     njets:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_loose:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_tight:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_vtight:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    # inc-SR1b:
-    #     dilep_mt_llnunu:
-    #         rebin: 4
-    #         range: [0, 1000]
-    #         blind: true
-    #     dilep_tau_loose_met_hadron_mt:
-    #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-    #         range: [0, 1500]
-    #         blind: true
-    #     m_T_WZ:
-    #         rebin: 1
-    #         range: [0, 600]
-    #         blind: true
-    #     mT_WZ:
-    #         rebin: [30, 30, 30, 60]
-    #         range: [0, 1500]
-    #         blind: true
-    #     inv_m_WZ:
-    #         rebin: [30, 30, 30, 60]
-    #         range: [0, 1500]
-    #         blind: true
-    #     baseweight:
-    #         rebin: 1 
-    #         range: [-30, 30]
-    #         blind: true
-    #     dilep_pt:
-    #         rebin: 3 
-    #         range: [0, 300]
-    #         blind: true
-    #     lead_jet_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     dilep_m:
-    #         rebin: 2 
-    #         range: [60, 120]
-    #         blind: true
-    #     met_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     tau_pt:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     taus_phi:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     taus_eta:
-    #         rebin: 1
-    #         range: [0, 2.5]
-    #         blind: true
-    #     tau_pt_loose:
-    #         rebin: 2 
-    #         range: [0, 300]
-    #         blind: true
-    #     taus_phi_loose:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     taus_eta_loose:
-    #         rebin: 1
-    #         range: [0, 2.5]
-    #         blind: true
-    #     dphi_met_ll:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_tau_met_phi:
-    #         rebin: 1
-    #         range: [0, 3.14159]
-    #         blind: true
-    #     dilep_dphi:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     dilep_dphi_tau:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     dphi_jet_met:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R:
-    #         rebin: 1
-    #         range: [0, 3.5]
-    #         blind: true
-    #     dilep_dR:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R_jet_dilep:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     delta_R_jet_tau:
-    #         rebin: 1
-    #         range: [1, 3.14159]
-    #         blind: true
-    #     nbjets:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     njets:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_loose:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_tight:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
-    #     ntaus_vtight:
-    #         rebin: 1
-    #         range: [0, 5]
-    #         blind: true
+            range: [0, 3.14159]
+            blind: true
+        taus_eta:
+            rebin: 1
+            range: [0, 2.5]
+            blind: true
+        dphi_met_ll:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_tau_met_phi:
+            rebin: 1
+            range: [0, 3.14159]
+            blind: true
+        dilep_dphi:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dilep_dphi_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        dphi_jet_met:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R:
+            rebin: 1
+            range: [0, 3.5]
+            blind: true
+        dilep_dR:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R_jet_dilep:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        delta_R_jet_tau:
+            rebin: 1
+            range: [1, 3.14159]
+            blind: true
+        deep_tau_jet:
+            rebin: 1
+            range: [0.8, 1.2]
+            blind: true
+        deep_tau_e:
+            rebin: 1
+            range: [0, 1]
+            blind: true
+        deep_tau_mu:
+            rebin: 1
+            range: [0, 1]
+            blind: true
     inc-SR01:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 4
             range: [0, 1000]
             blind: true
@@ -778,7 +550,7 @@ plotting:
             blind: true
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: true
         tau_pt:
             rebin: 2 
@@ -833,7 +605,7 @@ plotting:
             range: [0, 1]
             blind: true
     inc-B0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
             blind: false
@@ -851,7 +623,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt_loose:
             rebin: 1 
@@ -866,7 +638,7 @@ plotting:
             range: [0, 600]
             blind: false
     inc-B1:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
             blind: false
@@ -884,7 +656,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt_loose:
             rebin: 1 
@@ -899,7 +671,7 @@ plotting:
             range: [0, 600]
             blind: false
     inc-C0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
             blind: false
@@ -913,7 +685,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt_loose:
             rebin: 1 
@@ -928,7 +700,7 @@ plotting:
             range: [0, 600]
             blind: false
     inc-C1:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
             blind: false
@@ -942,7 +714,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt_loose:
             rebin: 1 
@@ -957,15 +729,9 @@ plotting:
             range: [0, 600]
             blind: false
     inc-D0:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
-            blind: false
-        dilep_tau_loose_met_hadron_mt:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
-            # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-            # rebin: 1
-            range: [0, 1500]
             blind: false
         dilep_pt:
             rebin: 2 
@@ -977,16 +743,12 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        taus_phi:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
         delta_R:
             rebin: 1
             range: [1, 5]
@@ -996,20 +758,10 @@ plotting:
             range: [0, 1000]
             blind: false
     inc-D1:
-        dilep_mt_llnunu:
+        dilep_mt:
             rebin: 2
             range: [0, 400]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
-            # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-            # rebin: 1
-            range: [0, 1500]
-            blind: false
-        taus_phi:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
         dilep_pt:
             rebin: 2 
             range: [0, 400]
@@ -1020,7 +772,7 @@ plotting:
             blind: false
         met_pt:
             rebin: 2 
-            range: [0, 300]
+            range: [0, 250]
             blind: false
         tau_pt:
             rebin: 1 
@@ -1034,124 +786,3 @@ plotting:
             rebin: 1
             range: [0, 600]
             blind: false
-    inc-SR1:
-        dilep_mt_llnunu:
-            rebin: 4
-            range: [0, 1000]
-            blind: true
-        dilep_tau_loose_met_hadron_mt:
-            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
-            range: [0, 1500]
-            blind: true
-        m_T_WZ:
-            rebin: 1
-            range: [0, 600]
-            blind: true
-        mT_WZ:
-            rebin: [30, 30, 30, 60]
-            range: [0, 1500]
-            blind: true
-        inv_m_WZ:
-            rebin: [30, 30, 30, 60]
-            range: [0, 1500]
-            blind: true
-        baseweight:
-            rebin: 1 
-            range: [-30, 30]
-            blind: true
-        dilep_pt:
-            rebin: 3 
-            range: [0, 300]
-            blind: true
-        lead_jet_pt:
-            rebin: 2 
-            range: [0, 300]
-            blind: true
-        dilep_m:
-            rebin: 2 
-            range: [60, 120]
-            blind: true
-        met_pt:
-            rebin: 2 
-            range: [0, 300]
-            blind: true
-        tau_pt:
-            rebin: 2 
-            range: [0, 300]
-            blind: true
-        taus_phi:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
-        taus_eta:
-            rebin: 1
-            range: [0, 2.5]
-            blind: true
-        tau_pt_loose:
-            rebin: 2 
-            range: [0, 300]
-            blind: true
-        taus_phi_loose:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
-        taus_eta_loose:
-            rebin: 1
-            range: [0, 2.5]
-            blind: true
-        dphi_met_ll:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        delta_tau_met_phi:
-            rebin: 1
-            range: [0, 3.14159]
-            blind: true
-        dilep_dphi:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        dilep_dphi_tau:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        dphi_jet_met:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        delta_R:
-            rebin: 1
-            range: [0, 3.5]
-            blind: true
-        dilep_dR:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        delta_R_jet_dilep:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        delta_R_jet_tau:
-            rebin: 1
-            range: [1, 3.14159]
-            blind: true
-        nbjets:
-            rebin: 1
-            range: [0, 5]
-            blind: true
-        njets:
-            rebin: 1
-            range: [0, 5]
-            blind: true
-        ntaus_loose:
-            rebin: 1
-            range: [0, 5]
-            blind: true
-        ntaus_tight:
-            rebin: 1
-            range: [0, 5]
-            blind: true
-        ntaus_vtight:
-            rebin: 1
-            range: [0, 5]
-            blind: true
