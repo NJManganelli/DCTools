@@ -1,0 +1,67 @@
+[project]
+name = "dctools"
+description = "Data Card Tools developed by Yacine Haddad and others at Northeastern University"
+readme = "README.md"
+version = "0.0.9"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Yacine Haddad", email = "yacine.haddad@cern.ch"},
+    {name = "Yixiao Han", email = "yixiao.han@cern.ch"},
+    {name = "Israr Israr", email = "israr.i@northeastern.edu"},
+    {name = "Nick Manganelli", email = "nmangane@cern.ch"}
+]
+maintainers = [
+    {name = "Yacine Haddad", email = "yacine.haddad@cern.ch"},
+    {name = "Yixiao Han", email = "yixiao.han@cern.ch"},
+    {name = "Israr Israr", email = "israr.i@northeastern.edu"},
+    {name = "Nick Manganelli", email = "nmangane@cern.ch"}
+]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering"
+]
+dependencies = [
+    "numpy",
+    "uproot",
+    "hist",
+    "boost_histogram >= 1.5.1",
+    "scipy"
+]
+
+# Installable scripts would require moving scripts into the source folder and renaming without hyphens
+# [project.scripts]
+# "make-plots.py" = "dctools.make_plots:main"
+# "makecard-boost-WZ.py" = "dctools.makecard_boost_WZ:main"
+# "merge-hist.py" = "dctools.merge_hist:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.setuptools]
+include-package-data = true
+package-dir = {"" = "src"}
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["dctools"]
+
+[tool.flake8]
+ignore = ["E203", "E231", "E501", "E722", "W503", "B950"]
+select = ["C", "E", "F", "W", "T", "B", "B9", "I"]
+per-file-ignores = {"tests/*" = ["T"]}
+
