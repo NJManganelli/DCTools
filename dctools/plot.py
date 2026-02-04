@@ -336,11 +336,12 @@ def mcplot(
     #     verticalalignment='bottom',
     #     transform=ax.transAxes
     # )
-    ax.legend(ncol=2, loc='upper right', fontsize=15)
+    ax.legend(ncol=2, loc='upper right', fontsize=10)
     if bx is not None:
-        bx.legend(loc='upper right', fontsize=15)
+        bx.legend(loc='upper right', fontsize=10)
         bx.set_xlabel(pred_ksum.axes[0].label)
         bx.set_ylabel('data/mc')
+    # print("bin_width_norm", bin_width_norm)
     ax.set_ylabel('events' if not bin_width_norm else 'events/GeV')
     
     return ax, bx
@@ -385,7 +386,7 @@ def check_systematic(
             syst_uncert_dw[np.isnan(syst_uncert_dw)] = 0
             
             # drawing the plots
-            fig = plt.figure(figsize=(6,7))
+            fig = fig = plt.figure(figsize=(6,7), constrained_layout=True)
             ax, bx = make_split(1 if no_ratios else 0.7)
             
             ax.set_title(f'{plot_file_name} : {s}')
@@ -414,7 +415,7 @@ def check_systematic(
                 hatch=4 * "/",
             )
             ax.set_xlim(l_edge[0], r_edge[-1])
-            ax.legend(ncol=2, loc='upper right')
+            ax.legend(ncol=2, loc='upper right', fontsize=12)
             ax.set_ylabel('events')
             ax.set_yscale('log')
 
@@ -456,7 +457,7 @@ def check_systematic(
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.png')
 
 def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="someyear", checksyst=True,
-             remap_replacement_types = None, bin_width_norm=None, no_ratios=False,
+             remap_replacement_types = None, logy=True, logx=False, bin_width_norm=None, no_ratios=False,
              combine_fit="pre-combine", combine_total_uncertainty="total_background", combine_channel_group=None) -> None:
     assert combine_fit in ["pre-combine", "prefit", "fit_b", "fit_s"]
     if remap_replacement_types is None:
@@ -570,7 +571,7 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     ymax = np.max([10000]+[c.get_height() for c in ax.containers[0] if ~np.isnan(c.get_height())])
     ymin = np.min([0.001]+[c.get_height() for c in ax.containers[0] if ~np.isnan(c.get_height())])
 
-    ax.set_ylim(0.001, 1000*ymax)
+    ax.set_ylim(0.001, 100*ymax)
     try:
         sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('VBSZZ2l2nu'),:]   
         sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('ZZ2l2nu'),:]   
@@ -585,14 +586,28 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     elif len(xlim) > 0:
         ax.set_xlim(xlim)
     ax.set_title(f"channel {combine_channel_group or channel}: {combine_era or era}")
-    hep.cms.label("", ax=ax, data=not blind, lumi=combine_lumi, year=combine_era or int(era)) #add lumi=lumi, add year=int(era) with handling of APV, etc.
-    ax.set_yscale('log')
+    # hep.cms.label("", ax=ax, data=not blind, lumi=combine_lumi, year=combine_era or int(era)) #add lumi=lumi, add year=int(era) with handling of APV, etc.
+    hep.cms.label("", ax=ax, data=not blind, lumi=config.luminosity.value)
+
+    if logy :
+        ylim_orig = ax.get_ylim()
+        if ylim_orig[0]<=0:
+            ax.set_ylim(10^(-1), ylim_orig[1])
+        ax.set_yscale('log')
+    if logx :
+        xlim_orig = ax.get_xlim()
+        if xlim_orig[0]<=0:
+            ax.set_xlim(10**(1.5), xlim_orig[1])
+            # print(xlim_orig[1])
+        ax.set_xscale('log')
 
     cmb_postfix = "-" + combine_fit if combine_fit in ["prefit", "fit_b", "fit_s"] else ""
     rrt_postfix = "-" + "-".join(remap_replacement_types) if (isinstance(remap_replacement_types, list) and len(remap_replacement_types) > 0 and not (len(remap_replacement_types) == 1 and remap_replacement_types[0] == "nothing")) else ""
     nrat_postfix = "-noratio" if no_ratios else ""
     gbwn_postfix = f"-binwnorm{bin_width_norm}".replace(".", "p") if bin_width_norm is not None else ""
+
     #xlim_postfix = f"-xlim{int(xlim[0])}-{int(xlim[1])}" if len(xlim) == 2 else ""
+    # plt.tight_layout()
     plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.pdf')
     plt.savefig(f'plot-{combine_channel_group or channel}-{variable}-{combine_era or era}{cmb_postfix}{rrt_postfix}{nrat_postfix}{gbwn_postfix}.png')
     plt.clf()
