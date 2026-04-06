@@ -43,6 +43,15 @@ class config_input:
             
     def __iter__(self):
         return iter(self._cfg)
+
+    def keys(self):
+        return self._cfg.keys()
+
+    def items(self):
+        return self._cfg.items()
+
+    def __repr__(self):
+        return yaml.dump(self._cfg, default_flow_style=False, sort_keys=False)
     
 class config_loader(yaml.SafeLoader):
     """YAML Loader with `!include` constructor."""
@@ -903,14 +912,17 @@ def dict_to_hist_axis(
             iterator = [
                 float(key)
                 for key in keys
-                if key.lower() not in ["underflow", "overflow"]
+                if str(key).lower() not in ["underflow", "overflow"]
             ]
+        bin_vals = np.array(iterator)
+        bin_widths = bin_vals[1:] - bin_vals[:-1]
+        min_bin = np.min(bin_widths)
         if "bins" not in all_args:
             all_args["bins"] = len(iterator)
         if "start" not in all_args:
             all_args["start"] = min(iterator)
         if "stop" not in all_args:
-            all_args["stop"] = max(iterator)
+            all_args["stop"] = max(iterator) + min_bin
         new_axis = hist.axis.Regular(**all_args)
         axes.insert(0, new_axis)
         h = hist.hist.Hist(
@@ -919,13 +931,14 @@ def dict_to_hist_axis(
         )
         filled_keys = set()
         for key, val in histos.items():
-            if key.lower() == "underflow" and flow:
+            if str(key).lower() == "underflow" and flow:
                 idx = 0
-            elif key.lower() == "overflow" and flow:
+            elif str(key).lower() == "overflow" and flow:
                 idx = new_axis.extent - 1
             else:
                 idx = new_axis.index(float(key))
-
+                if flow:
+                    idx = idx + 1
             if idx in filled_keys:
                 msg = f"Duplicate key found for Integer type: {key} -> {float(key)}"
                 raise ValueError(msg)
@@ -966,7 +979,7 @@ def dict_to_hist_axis(
                 [
                     float(key)
                     for key in keys
-                    if key.lower() not in ["underflow", "overflow"]
+                    if str(key).lower() not in ["underflow", "overflow"]
                 ]
             )
         new_axis = hist.axis.Variable(**all_args)
@@ -977,12 +990,14 @@ def dict_to_hist_axis(
         )
         filled_keys = set()
         for key, val in histos.items():
-            if key.lower() == "underflow" and flow:
+            if str(key).lower() == "underflow" and flow:
                 idx = 0
-            elif key.lower() == "overflow" and flow:
+            elif str(key).lower() == "overflow" and flow:
                 idx = new_axis.extent - 1
             else:
                 idx = new_axis.index(float(key))
+                if flow:
+                    idx = idx + 1
 
             if idx in filled_keys:
                 msg = f"Duplicate key found for Variable type: {key} -> {float(key)}"
