@@ -419,6 +419,15 @@ class datagroup:
 
 
         for proc, _hist in self.histograms.items():
+            # auto-rename observable
+            if self.observable not in _hist['hist'].axes.name:
+                auto_obs = None
+                for ax_name in _hist['hist'].axes.name:
+                    if ax_name not in ['channel', 'systematic']:
+                        auto_obs = ax_name
+                # auto_obs = (k for k in list(_hist['hist'].axes.name) if k not in ['channel', 'systematic'])[0]
+                print(f"Auto-renaming observable from {self.observable} to {auto_obs}")
+                self.observable = auto_obs
             # skip empty catgeories
             if self.channel not in _hist['hist'].axes['channel']:
                 continue
