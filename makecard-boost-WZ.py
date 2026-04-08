@@ -12,6 +12,7 @@ from typing import Any, IO
 import numpy as np
 import rich
 import warnings
+from statsmodels.nonparametric.smoothers_lowess import lowess
 
 class config_input:
     def __init__(self, cfg):
@@ -60,6 +61,57 @@ def construct_include(loader: config_loader, node: yaml.Node) -> Any:
             return ''.join(f.readlines())
 
 yaml.add_constructor('!include', construct_include, config_loader)
+
+# def smooth_ratio_lowess(nominal, variation, frac=0.4):
+#     if isinstance(variation, tuple):
+#         return tuple(smooth_ratio_lowess(nominal, var, frac=frac) for var in variation)
+#     nom = nominal.view(flow=False)['value']
+#     var = variation.view(flow=False)['value']
+
+#     if nom.ndim != 1:
+#         raise ValueError("smooth_ratio_lowess only supports 1D histograms.")
+
+#     mask = nom > 0
+#     ratio = np.ones_like(nom)
+#     ratio[mask] = var[mask] / nom[mask]
+
+#     x = np.arange(len(ratio))
+#     ratio_smooth = lowess(ratio, x, frac=frac, return_sorted=False)
+#     # diff = var - nom
+#     # x = np.arrange(len(diff))
+#     # diff_smooth = lowess(diff, x, frac=frac, return_sorted=False)
+
+#     var_smooth = ratio_smooth * nom
+#     # var_smooth = diff_smooth + nom
+#     var_smooth[var_smooth < 0] = 0.0
+
+   
+#     new_hist = variation.copy()
+#     new_hist.view(flow=False)['value'][:] = var_smooth
+
+#     return new_hist
+
+def smooth_diff_lowess(nominal, variation, frac=0.4):
+    if isinstance(variation, tuple):
+        return tuple(smooth_diff_lowess(nominal, var, frac=frac) for var in variation)
+    nom = nominal.view(flow=False)['value']
+    var = variation.view(flow=False)['value']
+
+    if nom.ndim != 1:
+        raise ValueError("smooth_ratio_lowess only supports 1D histograms.")
+
+    mask = nom > 0
+    diff = var - nom
+    x = np.arange(len(diff))
+    diff_smooth = np.zeros_like(diff)
+    diff_smooth[mask] = lowess(diff[mask], x[mask], frac=frac, return_sorted=False)
+    var_smooth = diff_smooth + nom
+    var_smooth = np.clip(var_smooth, 0, None)
+
+    new_hist = variation.copy()
+    new_hist.view(flow=False)['value'][:] = var_smooth
+
+    return new_hist
 
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
@@ -253,7 +305,25 @@ def main():
             rich.print(f"[red]Skipping shape nuisances for [green]{p.name} (remap_original_group_name={p.remap_original_group_name})")
         else:
             # scale factors / resolution
+            nominal = p.get("nominal")
             card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=False)
+            # res_e = p.get("ElectronEn")
+            # if res_e is not None:
+            #     res_e_smooth = smooth_diff_lowess(nominal, res_e, frac=0.3)
+            #     card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}", res_e_smooth, symmetrise=False)
+
+            # res_m = p.get("MuonRoc")
+            # if res_m is not None:
+            #     res_m_smooth = smooth_diff_lowess(nominal, res_m, frac=0.4)
+            #     card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}", res_m_smooth, symmetrise=False)
+
+            # res_t = p.get("TauEn")
+            # if res_t is not None:
+            #     res_t_smooth = smooth_diff_lowess(nominal, res_t, frac=0.4)
+            #     card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}", res_t_smooth, symmetrise=False)
+
+
+
             card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=False)
             card.add_shape_nuisance(p.name, f"CMS_res_t_{options.era}"  , p.get("TauEn")   , symmetrise=False)
             card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
@@ -278,6 +348,17 @@ def main():
             card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", p.get("JER"), symmetrise=False)
             card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
 
+            #lowess smothening method
+            # jer = p.get("JER")
+            # if jer is not None:
+            #     jer_smooth = smooth_diff_lowess(nominal, jer, frac=0.4)
+            #     card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", jer_smooth, symmetrise=False)
+            
+            # UES = p.get("UES")
+            # if UES is not None:
+            #     UES_smooth = smooth_diff_lowess(nominal, UES, frac=0.3)
+            #     card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", UES_smooth, symmetrise=False)
+
             # Can maybe ne correlated over era's?
             card.add_shape_nuisance(p.name, f"PS_FSR_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
             card.add_shape_nuisance(p.name, f"PS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
@@ -301,9 +382,16 @@ def main():
             #QCD scale, PDF and other theory uncertainty
             if 'gg' not in p.name:
                 card.add_qcd_scales(
-                        p.name, f"CMS_QCDScale{p.name}_{options.era}",
+                        p.name, f"CMS_QCDScale{p.name}",
                         [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
             )
+
+            # #Individual QCD scales
+
+            # if 'gg' not in p.name:
+            #     card.add_qcd_scales(p.name, f"CMS_QCDScale0{p.name}", [p.get("QCDScale0w")])
+            #     card.add_qcd_scales(p.name, f"CMS_QCDScale1{p.name}", [p.get("QCDScale1w")])
+            #     card.add_qcd_scales(p.name, f"CMS_QCDScale2{p.name}", [p.get("QCDScale2w")])
 
             # PDF uncertaintites / not working for the moment
             card.add_shape_nuisance(p.name, "pdf"   , p.get("PDF_weight"), symmetrise=False)
