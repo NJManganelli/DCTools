@@ -37,7 +37,7 @@ dependencies = [
     "numpy",
     "uproot",
     "hist",
-    "boost_histogram >= 1.5.1",
+    "boost_histogram >= 1.7.1",
     "scipy"
 ]
 
