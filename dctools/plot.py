@@ -89,7 +89,7 @@ def add_process_axis(
         # print(n, _h.view(flow=flow).shape)
         if storage is None:
             axes = [axis for axis in _h.axes]
-            storage = _h._storage_type()
+            storage = _h.storage_type() if hasattr(_h, "storage_type") else _h._storage_type()
         histos[n] = _h
 
     if axes is None:
@@ -557,6 +557,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
         combine_uncertainty_histo = combine_uncertainty_histo.project('systematic', variable)
     # projection must avoid the variable rebinning bug, this is a workaround and can be replaced by just variable once fixed: https://github.com/scikit-hep/hist/issues/639
     variable_in_axes = variable_in_datagroup if variable_in_datagroup is not None else variable
+    if variable_in_axes != variable:
+        print(f"Auto-renamed observable from {variable} to {variable_in_axes}")
     if _plot_channel is None:
         print(f"Could not identify correct variable/observable name: variable={variable} auto-observable={variable_in_datagroup} _plot_channel={_plot_channel}"
               "\nSkipping plotting for this configuration, as it likely indicates an empty histogram constructor is being created in the workflow")
