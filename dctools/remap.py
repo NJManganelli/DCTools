@@ -9,6 +9,8 @@ class inc_WZ_DataDrivenDY:
             "inc-D1": ("DY", "validation"),
             "inc-SR0": ("DY", "datadriven"),
             "inc-SR1": ("DY", "datadriven"),
+            "inc-VR0": ("DY", "datadriven"),
+            "inc-VR1": ("DY", "datadriven"),
             "inc-SR01": ("DY", "datadriven"),
         }
         assert all([chan in mapping.keys() for chan in inc_WZ_DataDrivenDY.expected_channels(dc_instance)]), f"In {__class__.__name__}, not all expected channels are found in the replaces_group_and_type method: {mapping.keys()}"
@@ -16,7 +18,7 @@ class inc_WZ_DataDrivenDY:
 
     @staticmethod
     def expected_channels(dc_instance):
-        return ['inc-D0', 'inc-SR0', 'inc-D1', 'inc-SR1', 'inc-SR01',]
+        return ['inc-D0', 'inc-SR0', 'inc-D1', 'inc-SR1', 'inc-VR0', 'inc-VR1', 'inc-SR01',]
 
     @staticmethod
     def expected_systvars(dc_instance):
@@ -43,6 +45,8 @@ class inc_WZ_DataDrivenDY:
             "inc-SR01": "inc-B01",
             "inc-D0": "inc-C0",
             "inc-D1": "inc-C1",
+            "inc-VR0": "inc-VB0",
+            "inc-VR1": "inc-VB1",
         }
         syst_dict = {
             "nominal": "datadriven_DDDYNominalUp",
