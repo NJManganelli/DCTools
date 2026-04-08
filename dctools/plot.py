@@ -73,6 +73,7 @@ def add_process_axis(
         axis_name: str = 'process',
         flow: bool = True) -> hist.Hist:
 
+    axes = None
     storage = None
     histos = {}
     for it, (n, p) in enumerate(histograms.items()):
@@ -90,7 +91,10 @@ def add_process_axis(
             axes = [axis for axis in _h.axes]
             storage = _h._storage_type()
         histos[n] = _h
-            
+
+    if axes is None:
+        # early exit, this was an emptry histogram constructed
+        return None
     iterator = histos.keys()
     new_axis = hist.axis.StrCategory(iterator, name=axis_name, label=axis_name)
     axes.insert(0, new_axis)
@@ -473,6 +477,7 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     if bin_width_norm is None and "bin_width_norm" in config:
         bin_width_norm = config.bin_width_norm
 
+    variable_in_datagroup = None
     for ng, name in enumerate(config.groups):
         if combine_fit == "pre-combine":
             # handle the plotting of histograms directly from SMQawa
@@ -543,14 +548,23 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
 
             if hasattr(config.groups[name], "color") and (hasattr(p, "shape") and len(p.shape)) or len(p.to_boost().shape):
                 color_cycle.append(config.groups[name].color)
-    
+        if p.observable != variable:
+            variable_in_datagroup = p.observable
     if combine_fit == "pre-combine":
         _plot_channel = plotter.add_process_axis(datasets)
     else:
         _plot_channel = dctools.dict_to_hist_axis(datasets, axis_name='process', axis_label=None, axis_type = 'StrCategory')
         combine_uncertainty_histo = combine_uncertainty_histo.project('systematic', variable)
     # projection must avoid the variable rebinning bug, this is a workaround and can be replaced by just variable once fixed: https://github.com/scikit-hep/hist/issues/639
-    variable_in_axes = variable if variable in _plot_channel.axes.name else ""
+    variable_in_axes = variable_in_datagroup if variable_in_datagroup is not None else variable
+    if _plot_channel is None:
+        print(f"Could not identify correct variable/observable name: variable={variable} auto-observable={variable_in_datagroup} _plot_channel={_plot_channel}"
+              "\nSkipping plotting for this configuration, as it likely indicates an empty histogram constructor is being created in the workflow")
+        return None, None
+    elif variable_in_axes not in _plot_channel.axes.name:
+        print(f"Could not identify correct variable/observable name: variable={variable} auto-observable={variable_in_datagroup} axes-names={_plot_channel.axes.name}"
+              "\nSkipping plotting for this configuration")
+        return None, None
     pred = _plot_channel.project('process', 'systematic', variable_in_axes)[:hist.loc('data'),:,:]
     data = _plot_channel[{'systematic':'nominal'}].project('process', variable_in_axes)[hist.loc('data'),:]
     
@@ -573,8 +587,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
 
     ax.set_ylim(0.001, 100*ymax)
     try:
-        sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('VBSZZ2l2nu'),:]   
-        sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('ZZ2l2nu'),:]   
+        sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable_in_axes)[hist.loc('VBSZZ2l2nu'),:]
+        sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable_in_axes)[hist.loc('ZZ2l2nu'),:]
         sig_ewk.plot(ax=ax, histtype='step', color='red', binwnorm=bin_width_norm)
         sig_qcd.plot(ax=ax, histtype='step', color='purple', binwnorm=bin_width_norm)
     except:
@@ -613,8 +627,8 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
     plt.clf()
     
     if checksyst:
-        pred = _plot_channel.project('process','systematic', variable)[:hist.loc('data'),:,:]
-        data = _plot_channel[{'systematic':'nominal'}].project('process',variable)[hist.loc('data'),:] 
+        pred = _plot_channel.project('process','systematic', variable_in_axes)[:hist.loc('data'),:,:]
+        data = _plot_channel[{'systematic':'nominal'}].project('process', variable_in_axes)[hist.loc('data'),:]
         plotter.check_systematic(
             pred[{'systematic':'nominal'}].stack('process'),
             syst=pred.stack('process'),
