@@ -1,6 +1,6 @@
 boosthist:
-  - ./data/merged-histogram-WZ-2016-Inc_WZ_lateset_alltau_jet_separation.pkl.gz
-  # - ./data/merged-histogram-WZ-2016-Inc_WZ_latest_DD_generic_had_mT_latest.pkl.gz
+  # - ./data/merged-histogram-Inc-WZ-2016-latest_DD_T_T_VT.pkl.gz
+  - ./data/merged-histogram-Inc-WZ-2016-latest_correct_DD_T_T_VT.pkl.gz
   
     
 xsections:
@@ -11,9 +11,9 @@ luminosity:
   value: 16.5
   # uncertainties with correlation breakdown from https://twiki.cern.ch/twiki/bin/view/CMS/LumiRecommendationsRun2
   # 2016 block
-  uncer_lumi_2016: 1.0
-  uncer_lumi_13TeV_1718: 0.0
-  uncer_lumi_13TeV_correlated: 0.6
+  uncer_lumi_13TeV_1516_l: 1.0118
+  uncer_lumi_13TeV_151617_l: 1.0004
+  uncer_lumi_13TeV_15161718_l: 1.0035
   
 
 groups:
@@ -186,15 +186,15 @@ plotting:
             range: [60, 120]
             blind: false
         dilep_tau_loose_met_hadron_mt:
-            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: false
         mT_WZ:
-            rebin: [30, 30, 30, 60]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
         inv_m_WZ:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 20, 20, 20, 30]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
         met_pt:
@@ -223,15 +223,15 @@ plotting:
             range: [0, 300]
             blind: false
         dilep_tau_loose_met_hadron_mt:
-            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: false
         mT_WZ:
-            rebin: [30, 30, 30, 60]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
         inv_m_WZ:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 20, 20, 20, 30]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
         dilep_m:
@@ -339,15 +339,15 @@ plotting:
             range: [0, 300]
             blind: true
         dilep_tau_loose_met_hadron_mt:
-            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: true
         mT_WZ:
-            rebin: [30, 30, 30, 60]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
         inv_m_WZ:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 20, 20, 20, 30]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
         baseweight:
@@ -420,7 +420,7 @@ plotting:
             range: [0, 1000]
             blind: true
         dilep_tau_loose_met_hadron_mt:
-            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: true
         m_T_WZ:
@@ -428,11 +428,11 @@ plotting:
             range: [0, 600]
             blind: true
         mT_WZ:
-            rebin: [30, 30, 30, 60]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
         inv_m_WZ:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 20, 20, 20, 30]
+            rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
         baseweight:
@@ -525,8 +525,7 @@ plotting:
             range: [0, 300]
             blind: true
         dilep_tau_loose_met_hadron_mt:
-            rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 10, 10, 20, 70]
-            range: [0, 1200]
+            rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 10, 65]
             blind: true
         m_T_WZ:
             rebin: 1
