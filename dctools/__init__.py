@@ -735,28 +735,31 @@ class datacard:
         for line in self.observation:
             self.dc_file.append(line)
         self.dc_file.append("-"*30)
+        # key widths and separators
+        min_width = max(36, max([len(k) for k in self.nuisances.keys()])+1)
+        key_width = "{0:<" + str(min_width) + "}"
+        min_sep = max(15, max([len(self.channel)] + [len(tup[0]) for tup in self.rates])+1)
+        separator = "{0:>" + str(min_sep) + "}"
         # bin lines
-        bins_line = "{0:<36}".format("bin")
-        proc_line = "{0:<36}".format("process")
-        indx_line = "{0:<36}".format("process")
-        rate_line = "{0:<36}".format("rate")
+        bins_line = key_width.format("bin")
+        proc_line = key_width.format("process")
+        indx_line = key_width.format("process")
+        rate_line = key_width.format("rate")
 
         i_signal = 0
-        i_backgr = 1 
+        i_backgr = 1
         for tup in self.rates:
-            bins_line += "{0:>15}".format(self.channel)
-            proc_line += "{0:>15}".format(tup[0])
+            bins_line += separator.format(self.channel)
+            proc_line += separator.format(tup[0])
             if 'signal' in tup[2]:
-                indx_line += "{0:>15}".format(i_signal)
+                indx_line += separator.format(i_signal)
             else:
-                indx_line += "{0:>15}".format(i_backgr)
-            rate_line += "{0:>15}".format("%.3f" % tup[1])
+                indx_line += separator.format(i_backgr)
+            rate_line += separator.format("%.3f" % tup[1])
             if 'signal' in tup[2]:
                 i_signal -= 1
             else:
                 i_backgr += 1
-
-            print("debug: ", indx_line, " : ", tup)
 
         self.dc_file.append(bins_line)
         self.dc_file.append(proc_line)
@@ -765,12 +768,12 @@ class datacard:
         self.dc_file.append("-"*30)
         for nuisance in sorted(self.nuisances.keys()):
             scale = self.nuisances[nuisance]
-            line_ = "{0:<10}".format(nuisance)
+            line_ = key_width.replace(">", "<").format(nuisance)
             for process, _, _ in self.rates:
                 if process in scale:
-                    line_ += "{0:>15}".format("%.4f" % scale[process])
+                    line_ += separator.format("%.4f" % scale[process])
                 else:
-                    line_ += "{0:>15}".format("-")
+                    line_ += separator.format("-")
             self.dc_file.append(line_)
         self.dc_file += self.extras
         # adding groups in the the datacards
