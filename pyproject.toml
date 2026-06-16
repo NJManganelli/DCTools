@@ -38,7 +38,8 @@ dependencies = [
     "uproot",
     "hist",
     "boost_histogram >= 1.7.1",
-    "scipy"
+    "scipy",
+    "statsmodels"
 ]
 
 # Installable scripts would require moving scripts into the source folder and renaming without hyphens
