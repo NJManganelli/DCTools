@@ -12,7 +12,7 @@ from typing import Any, IO
 import numpy as np
 import rich
 import warnings
-from statsmodels.nonparametric.smoothers_lowess import lowess
+# statsmodels is imported lazily inside smooth_diff_lowess() so it is only required when LOWESS smoothing is actually requested.
 
 class config_input:
     def __init__(self, cfg):
@@ -92,6 +92,7 @@ yaml.add_constructor('!include', construct_include, config_loader)
 #     return new_hist
 
 def smooth_diff_lowess(nominal, variation, frac=0.4):
+    from statsmodels.nonparametric.smoothers_lowess import lowess
     if isinstance(variation, tuple):
         return tuple(smooth_diff_lowess(nominal, var, frac=frac) for var in variation)
     nom = nominal.view(flow=False)['value']
