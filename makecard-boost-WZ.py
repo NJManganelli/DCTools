@@ -114,6 +114,182 @@ def smooth_diff_lowess(nominal, variation, frac=0.4):
 
     return new_hist
 
+# --------------------------------------------------------------------------------------
+# Auto-detection of CHANNEL-AXIS signal-template splitting.
+#
+# Some histograms encode subsets of a (signal) process as suffixes on the *channel* axis,
+# of the form "<base_channel>_<TAG>". Two flavours are supported and auto-detected here so
+# that no manual per-card configuration is needed:
+#
+#   * Fiducial-volume split (IFV / OFV): the "In Fiducial Volume" subset stays the signal
+#     (HiggsCombine index 0) while the "Out of Fiducial Volume" subset is demoted to an
+#     ADDITIONAL BACKGROUND. This treats the fit as a fiducial measurement while allowing
+#     migration between the in/out subsets the templates represent.
+#
+#   * Polarization split (fLR / f0 / fOther): each subset is its own *signal* template and
+#     therefore gets its own HiggsCombine enumeration (0, -1, -2, ...). This is left as a
+#     hook; it need not compose with the IFV/OFV split for now.
+#
+# NOTE: the *real* polarization templates produced by SMQawa are NOT channel-axis encoded --
+# they are separate top-level process keys and are handled by the process-key machinery further
+# below (see detect_polarization_signals). detect_signal_splits() below is the channel-axis path
+# only and is deliberately left untouched by the polarization work.
+#
+# Splitting only ever applies to signal-type groups. Background/data groups carry the plain
+# "<base_channel>" and are passed through unchanged.
+# --------------------------------------------------------------------------------------
+
+# tag -> ptype the tagged sub-template should be entered as. IFV stays signal, OFV -> background.
+FIDUCIAL_TAGS = {"IFV": "signal", "OFV": "background"}
+# polarization tags are all signal; listed order defines the (0, -1, -2, ...) enumeration order.
+POLARIZATION_TAGS = ["fLR", "f0", "fOther"]
+
+
+def get_group_channels(histograms, observable):
+    """Collect the set of channel-axis categories present for ``observable`` across a group's
+    raw (pre-``datagroup``) histograms."""
+    channels = set()
+    for _proc, hist_and_sumw in histograms.items():
+        h = hist_and_sumw.get("hist")
+        if isinstance(h, dict):
+            h = h.get(observable)
+        if h is None:
+            continue
+        if "channel" in h.axes.name:
+            channels.update(list(h.axes["channel"]))
+    return channels
+
+
+def detect_signal_splits(base_channel, group_channels, ptype, base_name):
+    """Decide how a requested ``base_channel`` should be expanded for one process group.
+
+    Returns an ordered list of ``(sub_name, sub_ptype, sub_channel)`` tuples. The ordering
+    matters: signal templates are enumerated 0, -1, -2, ... in the order they are later added
+    to the datacard, so IFV / polarization signals are emitted first.
+
+    - If ``base_channel`` exists directly, no split: ``[(base_name, ptype, base_channel)]``.
+    - For signal-type groups whose histograms only carry tagged sub-channels
+      ``"<base_channel>_<TAG>"``, expand into the recognised IFV/OFV and/or fLR/f0/fOther
+      templates. Unrecognised tags are ignored (falling back to the base channel).
+    """
+    # direct match -> nothing to split (the common case for background/data)
+    if base_channel in group_channels:
+        return [(base_name, ptype, base_channel)]
+
+    prefix = base_channel + "_"
+    tagged = {c[len(prefix):]: c for c in group_channels if c.startswith(prefix)}
+
+    # only signals are split; anything else must resolve to the plain base channel
+    if not tagged or ptype != "signal":
+        return [(base_name, ptype, base_channel)]
+
+    splits = []
+    # Fiducial-volume split: IFV signal first (index 0), then OFV as an extra background.
+    if any(t in FIDUCIAL_TAGS for t in tagged):
+        if "IFV" in tagged:
+            splits.append((base_name, FIDUCIAL_TAGS["IFV"], tagged["IFV"]))
+        if "OFV" in tagged:
+            splits.append((base_name + "_OFV", FIDUCIAL_TAGS["OFV"], tagged["OFV"]))
+    # Polarization split: each subset is its own signal, enumerated in POLARIZATION_TAGS order.
+    for tag in POLARIZATION_TAGS:
+        if tag in tagged:
+            splits.append((base_name + "_" + tag, "signal", tagged[tag]))
+
+    # no recognised tag -> fall back to the base channel (will be skipped downstream if empty)
+    if not splits:
+        return [(base_name, ptype, base_channel)]
+    return splits
+
+
+# --------------------------------------------------------------------------------------
+# Auto-detection of PROCESS-KEY polarization-template splitting.
+#
+# This is a *separate parallel path* from detect_signal_splits() above. Real polarization
+# templates produced by SMQawa are encoded as separate top-level process keys suffixed
+# "<base_process>__<boson>_<helicity>", e.g.
+#     WZTo3LNu_..._pythia8__Z_long / __Z_left / __Z_right          (Z boson)
+#     WZTo3LNu_..._pythia8__W_long  / __Wp_long / __Wm_long ...     (W / W+ / W-)
+# Each is a full reweighted copy of the parent sample; the three helicities of one boson are
+# entered as three independent signal POIs (Combine index 0, -1, -2) and the inclusive parent
+# is dropped from the signal stack to avoid multiple-counting. The four boson decompositions
+# (Z, W, Wp, Wm) are mutually exclusive measurements -- exactly one is selected per card,
+# inferred from the boson token in --variable.
+# --------------------------------------------------------------------------------------
+
+# helicity tags, in the order that fixes the (0, -1, -2) signal enumeration.
+POLARIZATION_HELICITIES = ["long", "left", "right"]
+
+
+def infer_polarization_boson(variable):
+    """Infer which boson's polarization is being measured from the observable (--variable) name.
+
+    Returns one of "Wp", "Wm", "Z", "W", or ``None`` when no boson token is present (in which
+    case the caller falls back to no split). Charge-specific tokens (wp/wm) are tested before
+    the bare w so e.g. "cos_theta_wp_reco" -> "Wp" rather than "W".
+    """
+    v = variable.lower()
+    if "wp" in v:
+        return "Wp"
+    if "wm" in v:
+        return "Wm"
+    if "_z" in v or "theta_z" in v:
+        return "Z"
+    if "_w" in v or "theta_w" in v:
+        return "W"
+    return None
+
+
+def _entry_has_observable(entry, observable):
+    """True if a raw {"hist": ..., "sumw": ...} entry carries ``observable``."""
+    h = entry.get("hist")
+    if isinstance(h, dict):
+        return observable in h
+    if h is None:
+        return False
+    return observable in h.axes.name
+
+
+def detect_polarization_signals(base_processes, boosthist, observable, mode, base_name):
+    """Expand a signal group into per-helicity polarization signal templates.
+
+    Looks for keys "<base_process>__<boson>_<helicity>" in ``boosthist`` where ``boson`` is
+    inferred from ``observable``. Returns an ordered list of ``(sub_name, [process_keys])`` --
+    one entry per helicity that is present, in POLARIZATION_HELICITIES order so the datacard
+    enumerates them 0, -1, -2. Returns ``[]`` when polarization splitting does not apply, so the
+    caller falls back to the normal inclusive/channel-axis path.
+
+    ``mode``: "off" -> never split (the caller skips this function); "auto" -> split silently
+    when templates are found, otherwise fall back; "on" -> split, but warn loudly when no
+    boson token / no templates are found so a misconfigured input is obvious.
+    """
+    boson = infer_polarization_boson(observable)
+    if boson is None:
+        if mode == "on":
+            rich.print(
+                f"[red]--polarization on[/red]: no boson token in variable "
+                f"'{observable}' for group [yellow]{base_name}[/yellow]; not splitting."
+            )
+        return []
+
+    splits = []
+    for hel in POLARIZATION_HELICITIES:
+        keys = []
+        for base in base_processes:
+            key = f"{base}__{boson}_{hel}"
+            if key in boosthist and _entry_has_observable(boosthist[key], observable):
+                keys.append(key)
+        if keys:
+            splits.append((f"{base_name}_{hel}", keys))
+
+    if not splits and mode == "on":
+        rich.print(
+            f"[red]--polarization on[/red]: boson [magenta]{boson}[/magenta] inferred from "
+            f"'{observable}' but no '<proc>__{boson}_<hel>' templates found for group "
+            f"[yellow]{base_name}[/yellow]; not splitting."
+        )
+    return splits
+
+
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-WZ_inclusive.yaml")
@@ -130,6 +306,14 @@ def main():
     )
     parser.add_argument('--blind', action='store_true', help='blinding the channel')
     parser.add_argument('--checksyst', action='store_true')
+    parser.add_argument(
+        '--polarization', choices=['auto', 'on', 'off'], default='auto',
+        help=("control process-key polarization-template splitting of signal groups. "
+              "'auto' (default): infer the boson from --variable and split into per-helicity "
+              "signal POIs when '<proc>__<boson>_<hel>' templates are present, otherwise behave "
+              "normally. 'on': same as auto but warn loudly when inference/templates are missing. "
+              "'off': disable splitting and use the inclusive signal process.")
+    )
     parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
 
     options = parser.parse_args()
@@ -143,6 +327,7 @@ def main():
     # make datasets per prcess
     datasets = {}
     signal = ""
+    signal_names = []
 
     if options.name=='':
         options.name == options.channel
@@ -166,41 +351,81 @@ def main():
         if isinstance(rebin, list) and len(rebin) < 2:
             rebin = rebin[0]
 
-        p = dctools.datagroup(
-            histograms = histograms,
-            ptype      = config.groups[name].type,
-            observable = options.variable,
-            name       = name,
-            xsections  = config.xsections,
-            channel    = options.channel,
-            luminosity = config.luminosity.value,
-            rebin      = rebin,
-            remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
-            # era        = options.era,
-        )
+        # Two independent signal-splitting mechanisms (see module-level notes):
+        #   * polarization (process-key encoding) -> per-helicity signal POIs;
+        #   * fiducial-volume / channel-axis (IFV/OFV) encoding.
+        # Polarization takes precedence; the two are not meant to compose. Each "split spec" is a
+        # tuple (sub_name, sub_ptype, sub_channel, sub_histograms): the polarization path swaps in
+        # a histograms dict filtered to the relevant process keys and leaves the channel alone,
+        # while the channel-axis path re-slices the group's full histograms by sub-channel.
+        group_ptype = config.groups[name].type
 
-        #remap_replacement_types lets us control whether we replace a given process with a remap type, such as a datadriven estimate.
-        # The remap_class should have a method which returns a tuple of the config group name for which a remapped group replaces, and what type it is categorized as
-        # for example, in WZ, we have a data driven estimate for SR0 and SR1 derived from B0 and B1, and these are called "datadriven" to indicate they are for full replacement
-        # of the DY MonteCarlo
-        # Meanwhile, we can do some crossvalidation/closure tests by looking at the datadriven etimate derived for other regions, so their type is "validation"
-        # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
-        if p.remap_replace_group_name is not None:
-            if p.remap_replace_type in options.remap_replacement_types:
-                rich.print(f"Overwriting: channel: [red]{p.channel}[/red] type: {p.remap_replace_type}, [yellow]{p.remap_replace_group_name}[/yellow] replaced by [green]{p.name}")
-                # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
-                p.remap_original_group_name = p.name
-                p.name = p.remap_replace_group_name
-                datasets[p.remap_replace_group_name] = p
-            else:
-                print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
-                # this process is ignored / not added to the stack
-                continue
+        pol_splits = []
+        if group_ptype == "signal" and options.polarization != "off":
+            pol_splits = detect_polarization_signals(
+                config.groups[name].processes, config.boosthist,
+                options.variable, options.polarization, name,
+            )
+
+        if pol_splits:
+            split_specs = [
+                (sub_name, "signal", options.channel,
+                 {k: config.boosthist[k] for k in keys})
+                for sub_name, keys in pol_splits
+            ]
+            rich.print(
+                f"[cyan]Polarization-split[/cyan] signal group [yellow]{name}[/yellow] "
+                f"(boson [magenta]{infer_polarization_boson(options.variable)}[/magenta]) -> "
+                + ", ".join(sn for sn, _sp, _sc, _h in split_specs)
+            )
         else:
-            # nominal path for MC/data which doesn't have a remap_class and
-            datasets[p.name] = p
-        if p.ptype == "signal":
-            signal = p.name
+            group_channels = get_group_channels(histograms, options.variable)
+            splits = detect_signal_splits(options.channel, group_channels, group_ptype, name)
+            split_specs = [(sn, sp, sc, histograms) for sn, sp, sc in splits]
+            if len(splits) > 1:
+                rich.print(
+                    f"[cyan]Auto-split[/cyan] signal group [yellow]{name}[/yellow] -> "
+                    + ", ".join(f"{sn} ([magenta]{sp}[/magenta] @ {sc})" for sn, sp, sc, _h in split_specs)
+                )
+
+        for sub_name, sub_ptype, sub_channel, sub_histograms in split_specs:
+            p = dctools.datagroup(
+                histograms = sub_histograms,
+                ptype      = sub_ptype,
+                observable = options.variable,
+                name       = sub_name,
+                xsections  = config.xsections,
+                channel    = sub_channel,
+                luminosity = config.luminosity.value,
+                rebin      = rebin,
+                remap_class_name = config.groups[name].remap_class_name if "remap_class_name" in config.groups[name] else None,
+                # era        = options.era,
+            )
+
+            #remap_replacement_types lets us control whether we replace a given process with a remap type, such as a datadriven estimate.
+            # The remap_class should have a method which returns a tuple of the config group name for which a remapped group replaces, and what type it is categorized as
+            # for example, in WZ, we have a data driven estimate for SR0 and SR1 derived from B0 and B1, and these are called "datadriven" to indicate they are for full replacement
+            # of the DY MonteCarlo
+            # Meanwhile, we can do some crossvalidation/closure tests by looking at the datadriven etimate derived for other regions, so their type is "validation"
+            # to toggle datadriven types and/or validation types (or any other type name you choose) to replace the given process, just add it to the remap_replacement_types list
+            if p.remap_replace_group_name is not None:
+                if p.remap_replace_type in options.remap_replacement_types:
+                    rich.print(f"Overwriting: channel: [red]{p.channel}[/red] type: {p.remap_replace_type}, [yellow]{p.remap_replace_group_name}[/yellow] replaced by [green]{p.name}")
+                    # overwrite a previously defined dataset in the dictionary. This requires the remap types to be after ALL MC in the config file (and still before the real data)
+                    p.remap_original_group_name = p.name
+                    p.name = p.remap_replace_group_name
+                    datasets[p.remap_replace_group_name] = p
+                else:
+                    print(f"Skipping: channel: {p.channel} type: {p.remap_replace_type}, {p.remap_replace_group_name} would have been replaced by {p.name}")
+                    # this process is ignored / not added to the stack
+                    continue
+            else:
+                # nominal path for MC/data which doesn't have a remap_class and
+                datasets[p.name] = p
+            if p.ptype == "signal":
+                signal = p.name
+                if p.name not in signal_names:
+                    signal_names.append(p.name)
 
 
     if options.plot:
@@ -216,9 +441,14 @@ def main():
         )
 
         try:
-            # sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('WZ_ewk'),:]
-            sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('WZ'),:]
-            # sig_ewk.plot(ax=ax, histtype='step', color='red')
+            # Overlay the (summed) signal. With polarization splitting the single "WZ" signal is
+            # replaced by per-helicity signals (WZ_long/WZ_left/WZ_right), so sum whatever signal
+            # datagroups were actually built rather than hard-coding the inclusive name.
+            overlay_names = signal_names if signal_names else ["WZ"]
+            sig_qcd = sum(
+                _plot_channel[{'systematic':'nominal'}].project('process', options.variable)[hist.loc(sn), :]
+                for sn in overlay_names
+            )
             sig_qcd.plot(ax=ax, histtype='step', color='purple')
         except:
             pass

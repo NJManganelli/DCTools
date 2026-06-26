@@ -488,9 +488,14 @@ class datagroup:
     def xs_scale(self, sumw, proc):
         xsec = 1.0
         if self.xsec is not None:
-            xsec  = self.xsec[proc].xsec
-            xsec *= self.xsec[proc].kr
-            xsec *= self.xsec[proc].br
+            # Polarization/templated sub-samples are keyed "<base>__<tag>" (e.g.
+            # "WZTo3LNu_...__Z_long") but are reweighted copies of the parent sample and so
+            # share its cross-section. Fall back to the base process name when the exact key
+            # is not present in the cross-section table.
+            key = proc if proc in self.xsec else proc.split("__")[0]
+            xsec  = self.xsec[key].xsec
+            xsec *= self.xsec[key].kr
+            xsec *= self.xsec[key].br
         else:
             print("[WARNING] cross-section file is empty ... ")
             
