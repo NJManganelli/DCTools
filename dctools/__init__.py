@@ -64,10 +64,18 @@ class config_loader(yaml.SafeLoader):
         super().__init__(stream)
 
 def construct_include(loader: config_loader, node: yaml.Node) -> Any:
-    """Include file referenced at node."""
-    filename = os.path.abspath(
-        os.path.join(loader._root, loader.construct_scalar(node))
-    )
+    """Include file referenced at node.
+
+    The path is resolved relative to the *including* config file first (so a config is
+    self-contained and works from any working directory), falling back to the path as
+    given (absolute / CWD-relative) for backward compatibility with existing configs.
+    """
+    name = loader.construct_scalar(node)
+    candidates = [
+        os.path.join(loader._root, name),  # relative to the including config file
+        name,                              # as given (absolute or CWD-relative)
+    ]
+    filename = os.path.abspath(next((c for c in candidates if os.path.exists(c)), candidates[0]))
     extension = os.path.splitext(filename)[1].lstrip('.')
 
     with open(filename, 'r') as f:
@@ -313,18 +321,23 @@ def read_combinehist(config):
     return combinehistos
 
 def read_config(file: str):
+    cfg_dir = os.path.dirname(os.path.abspath(file))
     with open(file) as f:
         try:
+            # Pass the file handle (not f.read()) so config_loader._root becomes the config
+            # file's directory and `!include` resolves relative to it.
             config = config_input(
-                yaml.load(f.read(), config_loader)
+                yaml.load(f, config_loader)
             )
             boosthist:Dict = {}
             for fname in config.boosthist:
-                if '.gz' in fname:
-                    with gzip.open(fname, "rb") as fn_:
+                # Resolve as-given (CWD-relative / absolute) first, then relative to the config file.
+                resolved = fname if os.path.exists(fname) else os.path.join(cfg_dir, fname)
+                if '.gz' in resolved:
+                    with gzip.open(resolved, "rb") as fn_:
                         boosthist.update(pickle.load(fn_))
                 else:
-                    with open(fname, 'rb') as fn_:
+                    with open(resolved, 'rb') as fn_:
                         boosthist.update(pickle.load(fn_))
             config.boosthist = boosthist
             if "combinehist" in config:
