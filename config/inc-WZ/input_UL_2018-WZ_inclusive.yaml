@@ -4,7 +4,7 @@ boosthist:
   # Default DCTools card-making histograms (restore for makecard/make-plots):
   # - ./data/merged-histogram-Inc-WZ-2018-latest_with_correct_DD_T_T_VT.pkl.gz
   # Config-relative path to the merged DD-region histograms (works from any CWD):
-  - ../../data/merged-histogram-Inc-WZ-2018-latest_SR01.pkl.gz
+  - ../../data/merged-histogram-Inc-WZ-2018-latest_with_DDDY_syst.pkl.gz
 
 xsections:
   !include xsections_2018.yaml

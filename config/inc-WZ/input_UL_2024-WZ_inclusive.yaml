@@ -1,8 +1,9 @@
 boosthist:
-  - ./data/merged-histogram-Inc-WZ-2024-latest.pkl.gz
+  # - ../../data/merged-histogram-Inc-WZ-2024-latest.pkl.gz 
+  - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz 
 
 xsections:
-  !include ./config/inc-WZ/xsections_2024.yaml
+  !include xsections_2024.yaml 
 
 luminosity:
   value: 109.08        
@@ -877,10 +878,10 @@ plotting:
     #         range: [0, 5]
     #         blind: true
     inc-SR01:
-        dilep_mt_llnunu:
-            rebin: 4
-            range: [0, 1000]
-            blind: true
+        # dilep_mt_llnunu:
+        #     rebin: 4
+        #     range: [0, 1000]
+        #     blind: true
         dilep_pt:
             rebin: 3 
             range: [0, 300]
@@ -913,7 +914,11 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: true
-        tau_pt:
+        tau_pt_vtight:
+            rebin: 2 
+            range: [0, 300]
+            blind: true
+        tau_pt_loose:
             rebin: 2 
             range: [0, 300]
             blind: true
@@ -1186,10 +1191,10 @@ plotting:
             range: [0, 5]
             blind: false
     inc-D0:
-        dilep_mt_llnunu:
-            rebin: 2
-            range: [0, 400]
-            blind: false
+        # dilep_mt_llnunu:
+        #     rebin: 2
+        #     range: [0, 400]
+        #     blind: false
         dilep_tau_loose_met_hadron_mt:
             rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
             # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
@@ -1221,6 +1226,10 @@ plotting:
             range: [1, 5]
             blind: false
         mT_WZ:
+            rebin: [1,1,1,1,1,1,1,1,1,1,10,40,40]
+            range: [0, 1000]
+            blind: false
+        mT_W:
             rebin: [1,1,1,1,1,1,1,1,1,1,10,40,40]
             range: [0, 1000]
             blind: false
@@ -1303,11 +1312,11 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-    inc-VR0:
-        dilep_mt_llnunu:
-            rebin: 2
-            range: [150, 600]
-            blind: false
+    inc-VR01:
+        # dilep_mt_llnunu:
+        #     rebin: 2
+        #     range: [150, 600]
+        #     blind: false
         dilep_pt:
             rebin: 2 
             range: [0, 300]
@@ -1323,6 +1332,10 @@ plotting:
             range: [0, 1500]
             blind: false
         mT_WZ:
+            rebin: [16, 7, 7, 30, 40, 50]
+            range: [0, 1500]
+            blind: false
+        mT_W:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
