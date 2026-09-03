@@ -1,6 +1,6 @@
 boosthist:
-  # - ../../data/merged-histogram-Inc-WZ-2024-latest.pkl.gz 
-  - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz 
+  - ../../data/merged-histogram-Inc-WZ_DD-2024-latest.pkl.gz 
+  # - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz 
 
 xsections:
   !include xsections_2024.yaml 
