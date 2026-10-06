@@ -8,6 +8,7 @@ import dctools
 import hist
 import matplotlib.pyplot as plt
 from dctools import plot as plotter
+import copy
 from typing import Any, IO, Dict
 import numpy as np
 import rich
@@ -15,15 +16,114 @@ import warnings
 from statsmodels.nonparametric.smoothers_lowess import lowess
 
 
+# boson -> fit observable; must match BOSON_CONFIG in SMQawa/polarization_split.py
 BOSON_OBS = {
-    "W":  "qcos_theta_w_reco",
-    "Wp": "cos_theta_wp_reco",
-    "Wm": "cos_theta_wm_reco",
-    "Z":  "cos_theta_z_reco",
+    "W":     "qcos_theta_w_reco",    # W, inclusive WZ (charge-folded angle)
+    "Wp":    "cos_theta_wp_reco",    # W+
+    "Wm":    "cos_theta_wm_reco",    # W-
+    "Z":     "cos_theta_z_reco",     # Z, inclusive WZ
+    "Z_WpZ": "cos_theta_wpz_reco",   # Z in W+Z
+    "Z_WmZ": "cos_theta_wmz_reco",   # Z in W-Z
 }
-# the 12 split-signal config groups (only used in polarization mode)
-POL_SPLIT_GROUPS = {f"WZ_{b}_{p}" for b in ("W", "Wp", "Wm", "Z")
-                    for p in ("long", "left", "right")}
+POLS = ("long", "left", "right")
+# the 18 split-signal config groups WZ_<boson>_<pol> (only used in polarization mode)
+POL_SPLIT_GROUPS = {f"WZ_{b}_{p}" for b in BOSON_OBS for p in POLS}
+# WZ events with no valid gen W->tau nu + Z->ll are in none of the templates
+# (~5% of the SR01 WZ yield in Run 2, ~2% in 2024). In polarization mode they are
+# added back as this background, built on the fly from the inclusive WZ group.
+POL_UNMATCHED_GROUPS = {f"WZ_{b}_unmatched" for b in BOSON_OBS}
+# every card process that is a piece of the one WZ sample (shares its QCD-scale nuisance)
+WZ_POL_PIECES = POL_SPLIT_GROUPS | POL_UNMATCHED_GROUPS
+# boson -> weight prefix of its pure-state templates <obs>_<wpref>_<pol> in the
+# inclusive WZ histograms (qawa.polarization naming)
+BOSON_WPREF = {"W": "wZW", "Wp": "wZWp", "Wm": "wZWm",
+               "Z": "wWZ", "Z_WpZ": "wWpZ", "Z_WmZ": "wWmZ"}
+
+
+# ---------------------------------------------------------------------------
+# Unmatched WZ: U = nominal - sum_p f_p T_p
+# ---------------------------------------------------------------------------
+def _hist_values(h):
+    """(value, variance) arrays including flow bins; variance None for non-Weight storage."""
+    v = h.view(flow=True)
+    return (np.asarray(v["value"]), np.asarray(v["variance"])) if v.dtype.names else (np.asarray(v), None)
+
+
+def _aligned_values(h_src, h_ref):
+    """Values of h_src laid out on h_ref's channel/systematic categories (the
+    StrCategory order can differ between histograms). Missing categories are zero."""
+    names = [a.name for a in h_ref.axes]
+    if [a.name for a in h_src.axes] != names or names[:2] != ["channel", "systematic"]:
+        raise ValueError(f"[pol] axis mismatch: {[a.name for a in h_src.axes]} vs {names}")
+    ref_val, _ = _hist_values(h_ref)
+    src_val, _ = _hist_values(h_src)
+    out = np.zeros_like(ref_val)
+    src_ch, src_sy = list(h_src.axes["channel"]), list(h_src.axes["systematic"])
+    missing = []
+    for i, c in enumerate(h_ref.axes["channel"]):
+        if c not in src_ch:
+            missing.append(c)
+            continue
+        ic = src_ch.index(c)
+        for j, s in enumerate(h_ref.axes["systematic"]):
+            if s not in src_sy:
+                missing.append(f"{c}/{s}")
+                continue
+            out[i, j] = src_val[ic, src_sy.index(s)]
+    return out, missing
+
+
+def pol_gen_fractions(hists, boson):
+    """Generator fractions (f0, fL, fR) the processor built the templates with,
+    recovered from the gen-level histograms: nominal_gen = sum_p f_p T_p^gen
+    (all channels, nominal systematic), solved by least squares. Exact up to
+    float precision when the pure-state weights are consistent."""
+    obs, wpref = BOSON_OBS[boson], BOSON_WPREF[boson]
+    gobs = obs.replace("_reco", "_gen")
+    keys = [gobs] + [f"{gobs}_{wpref}_{p}" for p in POLS]
+    missing = [k for k in keys if k not in hists]
+    if missing:
+        raise KeyError(f"[pol] gen-level histograms for {boson} not found: {missing}")
+
+    def _flat(name):
+        return hists[name][{"systematic": "nominal"}].project(gobs).values()
+
+    nom = _flat(gobs)
+    T = np.vstack([_flat(k) for k in keys[1:]]).T
+    f, *_ = np.linalg.lstsq(T, nom, rcond=None)
+    resid = np.max(np.abs(T @ f - nom)) / max(nom.max(), 1e-12)
+    if abs(f.sum() - 1) > 1e-3 or resid > 1e-3:
+        warnings.warn(f"[pol] {boson}: gen templates do not close exactly "
+                      f"(sum f = {f.sum():.5f}, max rel. residual = {resid:.1e})")
+    return dict(zip(("f0", "fL", "fR"), map(float, f)))
+
+
+def pol_unmatched_hist(hists, boson):
+    """U = nominal - sum_p f_p T_p on the nominal's axes, for every channel and
+    systematic: the WZ events in none of the pure-state templates (no valid gen
+    W -> tau nu + Z -> ll). Negative bins (negative MC weights at low statistics)
+    are clipped to zero. The variance cannot be recovered from the inputs; it is
+    the nominal variance scaled by the unmatched share of the bin."""
+    obs, wpref = BOSON_OBS[boson], BOSON_WPREF[boson]
+    f = pol_gen_fractions(hists, boson)
+    h_nom = hists[obs]
+    nval, nvar = _hist_values(h_nom)
+    matched = np.zeros_like(nval)
+    missing = set()
+    for p, fk in zip(POLS, ("f0", "fL", "fR")):
+        val, miss = _aligned_values(hists[f"{obs}_{wpref}_{p}"], h_nom)
+        matched += f[fk] * val
+        missing.update(miss)
+    if missing:
+        warnings.warn(f"[pol] {boson}: templates lack {sorted(missing)[:5]}... -- "
+                      f"treated as zero, so U = nominal there")
+    u = np.clip(nval - matched, 0.0, None)
+    share = np.divide(u, nval, out=np.zeros_like(u), where=nval > 0)
+    h_u = copy.deepcopy(h_nom)
+    view = h_u.view(flow=True)
+    view["value"] = u
+    view["variance"] = (nvar if nvar is not None else u) * np.clip(share, 0.0, 1.0)
+    return h_u, f
 
 # modes in which an out-of-fiducial WZ background is added
 FIDUCIAL_MODES = ("fiducial", "asymmetry_fiducial")
@@ -243,13 +343,15 @@ def plan_group(mode, boson, name, gtype, channel):
     Returns dict(card_name, channel, ptype) or None to skip this group.
     `name` stays the config-group key (for processes / remap lookup); the card
     process label is `card_name`."""
-    if mode == "standard":
-        return dict(card_name=name, channel=channel, ptype=gtype)
-
     is_split = name in POL_SPLIT_GROUPS
 
+    if mode == "standard":
+        if is_split:                             # the split templates are copies of the inclusive WZ
+            return None
+        return dict(card_name=name, channel=channel, ptype=gtype)
+
     if mode == "polarization":
-        keep = {f"WZ_{boson}_long", f"WZ_{boson}_left", f"WZ_{boson}_right"}
+        keep = {f"WZ_{boson}_{p}" for p in POLS}
         if gtype == "signal":
             if name in keep:
                 return dict(card_name=name, channel=channel, ptype="signal")
@@ -306,7 +408,9 @@ def main():
     parser.add_argument("--mode", type=str, default="standard",
                         choices=["standard", "polarization", "asymmetry", "fiducial", "asymmetry_fiducial"],
                         help="which WZ measurement this card is for")
-    parser.add_argument("--boson", type=str, default="W", choices=["W", "Wp", "Wm", "Z"], help="(polarization mode) which boson helicity to fit")
+    parser.add_argument("--boson", type=str, default="W", choices=list(BOSON_OBS),
+                        help="(polarization mode) which boson helicity to fit: W, Wp, Wm, Z, "
+                             "Z_WpZ (Z in W+Z) or Z_WmZ (Z in W-Z)")
 
     options = parser.parse_args()
     config = dctools.read_config(options.input)
@@ -392,6 +496,47 @@ def main():
         if p.ptype == "signal":
             signal = p.name
 
+    if options.mode == "polarization":
+        # Unmatched WZ: the part of the inclusive WZ that is in none of the three
+        # pure-state templates (no valid gen W -> tau nu + Z -> ll, e.g. fake or
+        # leptonic taus). U = nominal - sum_p f_p T_p, for the nominal and every
+        # systematic variation, with the generator fractions f_p recovered from the
+        # same file (pol_unmatched_hist above). It is a background: the POIs only
+        # scale the templates. Each piece is keyed by its parent WZ dataset name, so
+        # the standard cross-section lookup applies (it is a part of that sample).
+        wz_group = "WZ"
+        if wz_group not in config.groups:
+            raise KeyError(f"polarization mode needs the inclusive '{wz_group}' group in the "
+                           f"config to build the unmatched WZ background")
+        unmatched = {}
+        for proc in config.groups[wz_group].processes:
+            if proc not in config.boosthist:
+                continue
+            entry = config.boosthist[proc]
+            h_u, fr = pol_unmatched_hist(entry["hist"], options.boson)
+            rich.print(f"   {proc} {options.boson}: f0={fr['f0']:.4f} fL={fr['fL']:.4f} fR={fr['fR']:.4f}")
+            unmatched[proc] = {"hist": {observable: h_u}, "sumw": entry["sumw"]}
+        if not unmatched:
+            raise KeyError(f"none of {list(config.groups[wz_group].processes)} is in the input histograms")
+        um_name = f"WZ_{options.boson}_unmatched"
+        p_um = dctools.datagroup(
+            histograms = unmatched,
+            ptype      = "background",
+            observable = observable,
+            name       = um_name,
+            xsections  = config.xsections,
+            channel    = options.channel,
+            luminosity = config.luminosity.value,
+            rebin      = get_rebin(config, options.channel, observable, options.rebin),
+            remap_class_name = None,
+        )
+        datasets[um_name] = p_um
+        n_tpl = ", ".join(f"{p} {datasets[f'WZ_{options.boson}_{p}'].get('nominal').sum().value:.2f}"
+                          for p in POLS if f"WZ_{options.boson}_{p}" in datasets)
+        rich.print(f"   [yellow]{um_name}[/yellow] (background): "
+                   f"{p_um.get('nominal').sum().value:.2f} events in {options.channel}  "
+                   f"(pure-state templates, each normalised to all of WZ: {n_tpl})")
+
     if options.mode in FIDUCIAL_MODES:
         wz_group = "WZ"
         if wz_group in config.groups:
@@ -469,37 +614,64 @@ def main():
 
     rich.print("[yellow]btag uncertainties disabled")
 
-    dd_nuisance_alias = {
-        "scale_e":       f"CMS_scale_e_{options.era}",
-        "res_e":         f"CMS_res_e_{options.era}",
-        "scale_m":       f"CMS_scale_m_{options.era}",
-        "res_m":         f"CMS_res_m_{options.era}",
-        "scale_t":       f"CMS_scale_t_{options.era}",
-        "eff_e_reco":    f"CMS_eff_e_reco_{options.era}",
-        "eff_e_id":      f"CMS_eff_e_id_{options.era}",
-        "eff_m_id":      f"CMS_eff_m_id_{options.era}",
-        "eff_m_iso":     f"CMS_eff_m_iso_{options.era}",
-        "triggerSF":     f"CMS_trig_sf_{options.era}",
-        "pileup_weight": f"CMS_pileup_{options.era}",
-        "UES":           f"CMS_UES_{options.era}",
-        "JER":           f"CMS_jer_{options.era}",
-        "UEPS_FSR":      f"PS_FSR",
-        "UEPS_ISR":      f"PS_ISR",
-        "PDF_weight":    "pdf",
+    # ------------------------------------------------------------------
+    # Nuisances are driven by the histograms: every variation on a process's
+    # 'systematic' axis becomes a shape nuisance. NUISANCE_NAMES only renames
+    # the processor's names to the CMS datacard names; anything not listed keeps
+    # its own name (the JES sources, prefiring_weight, jetPUid_sf, HEM, the DD
+    # stat_<era>, ...). MC and the data-driven estimate use the SAME table, so a
+    # variation propagated into the DD estimate always gets the same name as the
+    # MC one and the two stay correlated.
+    # Systematics conventions: https://gitlab.cern.ch/cms-analysis/general/systematics/-/blob/master/systematics_master.yml
+    # ------------------------------------------------------------------
+    era = options.era
+    NUISANCE_NAMES = {
+        "scale_e":       f"CMS_scale_e_{era}",
+        "res_e":         f"CMS_res_e_{era}",
+        "scale_m":       f"CMS_scale_m_{era}",
+        "res_m":         f"CMS_res_m_{era}",
+        "scale_t":       f"CMS_scale_t_{era}",
+        "eff_e_reco":    f"CMS_eff_e_reco_{era}",
+        "eff_e_id":      f"CMS_eff_e_id_{era}",
+        "eff_m_id":      f"CMS_eff_m_id_{era}",
+        "eff_m_iso":     f"CMS_eff_m_iso_{era}",
+        "tauIDvsjet_sf": f"CMS_t_id_vsjet_{era}",
+        "tauIDvse_sf":   f"CMS_t_id_vse_{era}",
+        "tauIDvsmu_sf":  f"CMS_t_id_vsmu_{era}",
+        "triggerSF":     f"CMS_trig_sf_{era}",
+        "pileup_weight": f"CMS_pileup_{era}",
+        "JER":           f"CMS_jer_{era}",
+        "UES":           f"CMS_UES_{era}",
+        "UEPS_FSR":      "PS_FSR",
+        "UEPS_ISR":      "PS_ISR",
+        "PDF_weight":    "pdf",      # might have to be anticorrelated for W+Z and W-Z
         "aS_weight":     "alphaS",
-        "tauIDvsjet_sf": f"CMS_t_id_vsjet_{options.era}",
-        "tauIDvse_sf":   f"CMS_t_id_vse_{options.era}",
-        "tauIDvsmu_sf":  f"CMS_t_id_vsmu_{options.era}",
     }
-    # Bases handled specially in the DD branch (NOT via the plain alias loop):
-    #   QCDScale0w/1w/2w      -> collapsed into CMS_QCDScaleDY via add_qcd_scales
-    #   JES (bare JES_Total)  -> dropped (no MC counterpart)
-    #   kEW                   -> dropped (EWK corr doesn't apply to data-driven DY)
-    dd_qcd_bases  = {"QCDScale0w", "QCDScale1w", "QCDScale2w"}
-    dd_drop_bases = {"JES", "kEW"}
+    # Variations handled outside the plain rename:
+    #   QCDScale0w/1w/2w -> collapsed into one QCD-scale nuisance per process
+    #   JES              -> dropped: the total JES, already covered by the split JES sources
+    #   kEW              -> ewk_corr_WZ / ewk_corr_ZZ for the WZ / ZZ MC, dropped otherwise
+    #                       (the EWK correction does not apply to the data-driven DY)
+    QCD_BASES = ("QCDScale0w", "QCDScale1w", "QCDScale2w")
+    DROPPED_BASES = {"JES"}
+
+    def qcd_scale_name(p):
+        if p.remap_replace_group_name is not None:
+            return "CMS_QCDScale_DDDY_prop"
+        # the polarization templates and the unmatched part are all pieces of one
+        # WZ sample: one QCD-scale nuisance for all of them, not one per piece
+        return "CMS_QCDScaleWZ" if p.name in WZ_POL_PIECES else f"CMS_QCDScale{p.name}"
+
+    def ewk_name(p):
+        if p.remap_replace_group_name is not None:
+            return None
+        if "WZ" in p.name:
+            return "ewk_corr_WZ"
+        if "ZZ" in p.name and "EWK" not in p.name:
+            return "ewk_corr_ZZ"
+        return None
 
     for _, p in datasets.items():
-        # Systematics Conventions: https://gitlab.cern.ch/cms-analysis/general/systematics/-/blob/master/systematics_master.yml?ref_type=heads
         print(" --> ", p.name)
         if len(p.to_boost().shape) == 0 or p.get("nominal").sum().value == 0:
             print(f"--> histogram for the process {p.name} is empty !")
@@ -508,102 +680,44 @@ def main():
         if p.ptype=="data":
             continue
         if not card.add_nominal(p.name, p.get("nominal"), p.ptype): continue
-        year = options.era.replace('APV','')
+        is_dd = p.remap_replace_group_name is not None
 
-        # luminosity (Run 2 scheme, Run 3 warn-and-continue, else raise)
-        add_lumi_uncertainties(card, p, config, options.era)
+        # luminosity (Run 2 scheme, Run 3 warn-and-continue, else raise); not for the
+        # data-driven estimate, which comes from data and does not scale with the luminosity
+        if not is_dd:
+            add_lumi_uncertainties(card, p, config, options.era)
 
-        if p.remap_replace_group_name is not None:
-            dd_bases = set(_shape_nuisance_bases(p))
-            added, dropped = [], []
-            for base in sorted(dd_bases):
-                if base in dd_drop_bases:
+        present = set(_shape_nuisance_bases(p))
+        added, dropped = [], []
+        for base in sorted(present):
+            if base in QCD_BASES:
+                continue                                   # handled together below
+            if base in DROPPED_BASES:
+                dropped.append(base)
+                continue
+            if base == "kEW":
+                nuis = ewk_name(p)
+                if nuis is None:
                     dropped.append(base)
                     continue
-                if base in dd_qcd_bases:
-                    continue  # handled together below
-                nuis = dd_nuisance_alias.get(base, base)
-                card.add_shape_nuisance(p.name, nuis, p.get(base), symmetrise=False)
-                added.append(f"{base}->{nuis}" if nuis != base else base)
-            # QCD scale: collapse the three inputs into one per-process nuisance,
-            # same as the MC block, but force the DY-specific name CMS_QCDScaleDY
-            # (p.name is 'DDDY' after the remap, which would give CMS_QCDScaleDDDY).
-            if dd_qcd_bases <= dd_bases:
-                card.add_qcd_scales(p.name, "CMS_QCDScale_DDDY_prop",
-                                    [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")])
-                added.append("QCDScale0w/1w/2w->CMS_QCDScaleDY")
-            elif dd_bases & dd_qcd_bases:
-                warnings.warn(f"[cards] {p.name}: partial QCDScale set {sorted(dd_bases & dd_qcd_bases)}; "
-                              f"skipping QCD scale nuisance.")
+            else:
+                nuis = NUISANCE_NAMES.get(base, base)
+            card.add_shape_nuisance(p.name, nuis, p.get(base), symmetrise=False)
+            added.append(f"{base}->{nuis}" if nuis != base else base)
+
+        if all(b in present for b in QCD_BASES):
+            nuis = qcd_scale_name(p)
+            card.add_qcd_scales(p.name, nuis, [p.get(b) for b in QCD_BASES])
+            added.append(f"QCDScale0w/1w/2w->{nuis}")
+        elif present & set(QCD_BASES):
+            warnings.warn(f"[cards] {p.name}: partial QCDScale set {sorted(present & set(QCD_BASES))}; "
+                          f"skipping QCD scale nuisance.")
+
+        if is_dd:
             rich.print(f"[green]DD {p.name} (from {p.remap_original_group_name}): added {added}")
             if dropped:
                 rich.print(f"[yellow]DD {p.name}: dropped {dropped}")
         else:
-            nominal = p.get("nominal")
-
-            present = set(_shape_nuisance_bases(p))
-            def _add_if_present(nuis, base):
-                if base in present:
-                    card.add_shape_nuisance(p.name, nuis, p.get(base), symmetrise=False)
-                else:
-                    warnings.warn(f"[cards] {p.name}: expected variation '{base}' not on "
-                                  f"the systematic axis; skipping nuisance '{nuis}'.")
-            _add_if_present(f"CMS_scale_e_{options.era}", "scale_e")
-            _add_if_present(f"CMS_res_e_{options.era}"  , "res_e")
-            _add_if_present(f"CMS_scale_m_{options.era}", "scale_m")
-            _add_if_present(f"CMS_res_m_{options.era}"  , "res_m")
-            _add_if_present(f"CMS_scale_t_{options.era}", "scale_t")
-            _add_if_present(f"CMS_eff_e_reco_{options.era}", "eff_e_reco")
-            _add_if_present(f"CMS_eff_e_id_{options.era}"  , "eff_e_id")
-            _add_if_present(f"CMS_eff_m_id_{options.era}"  , "eff_m_id")
-            _add_if_present(f"CMS_eff_m_iso_{options.era}" , "eff_m_iso")
-            _add_if_present(f"CMS_t_id_vsjet_{options.era}", "tauIDvsjet_sf")
-            _add_if_present(f"CMS_t_id_vse_{options.era}"  , "tauIDvse_sf")
-            _add_if_present(f"CMS_t_id_vsmu_{options.era}" , "tauIDvsmu_sf")
-
-            _add_if_present(f"CMS_trig_sf_{options.era}", "triggerSF")
-
-            # JES/JES and UEPS -- gated: p.get() raises KeyError on a missing
-            # variation (e.g. JER absent for 2024), so every add must check `present`.
-            _add_if_present(f"JES_Absolute{year}"      , f"JES_Absolute{year}")
-            _add_if_present(f"JES_BBEC1{year}"         , f"JES_BBEC1{year}")
-            _add_if_present(f"JES_EC2{year}"           , f"JES_EC2{year}")
-            _add_if_present(f"JES_HF{year}"            , f"JES_HF{year}")
-            _add_if_present(f"JES_RelativeSample{year}", f"JES_RelativeSample{year}")
-
-            _add_if_present(f"JES_Absolute"   , "JES_Absolute")
-            _add_if_present(f"JES_BBEC1"      , "JES_BBEC1")
-            _add_if_present(f"JES_EC2"        , "JES_EC2")
-            _add_if_present(f"JES_HF"         , "JES_HF")
-            _add_if_present(f"JES_RelativeBal", "JES_RelativeBal")
-            _add_if_present(f"JES_FlavorQCD"  , "JES_FlavorQCD")
-
-            _add_if_present(f"CMS_jer_{options.era}", "JER")
-            _add_if_present(f"CMS_UES_{options.era}", "UES")
-
-            # Can maybe ne correlated over era's?
-            _add_if_present(f"PS_FSR", "UEPS_FSR")
-            _add_if_present(f"PS_ISR", "UEPS_ISR")
-
-            # other uncertainties
-            _add_if_present(f"CMS_pileup_{options.era}", "pileup_weight")
-
-            if all(f"QCDScale{i}w" in present for i in range(3)):
-                card.add_qcd_scales(p.name, f"CMS_QCDScale{p.name}",
-                                    [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")])
-            else:
-                warnings.warn(f"[cards] {p.name}: QCDScale0w/1w/2w not all present; skipping QCD scale nuisance.")
-
-            # PDF uncertaintites / not working for the moment
-            _add_if_present("pdf"   , "PDF_weight") #pdf might have to be anticorrelated for W+Z and W-Z
-            _add_if_present("alphaS", "aS_weight")
-
-            # Electroweak Corrections uncertainties
-            if ('WZ' in p.name):
-                _add_if_present("ewk_corr_WZ", "kEW")
-            if ('ZZ' in p.name) and ('EWK' not in p.name):
-                _add_if_present("ewk_corr_ZZ", "kEW")
-
             # Add Barlow-Beeston Lite MC Stat uncertainty
             if ('DY' not in p.name):
                 card.add_auto_stat()
