@@ -1,7 +1,8 @@
 WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
-  xsec: 5.213
+  xsec: 4.6660
+  #XDB 5.213 and other value is 4.4297
 DY1JetsToLL_M-50_LHEZpT_150-250_TuneCP5_13TeV-amcnloFXFX-pythia8: 
   br: 1.0
   kr: 1.0
@@ -489,3 +490,75 @@ DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
   br: 1.0
   kr: 1.0
   xsec: 0.04728
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_long:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_left:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_right:
+  br: 1.0
+  kr: 1.0
+  xsec: 4.6660
