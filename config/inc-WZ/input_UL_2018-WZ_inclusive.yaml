@@ -4,8 +4,9 @@ boosthist:
   # Default DCTools card-making histograms (restore for makecard/make-plots):
   # - ./data/merged-histogram-Inc-WZ-2018-latest_with_correct_DD_T_T_VT.pkl.gz
   # Config-relative path to the merged DD-region histograms (works from any CWD):
-  - ../../data/merged-histogram-Inc-WZ-2018-latest_with_DDDY_syst.pkl.gz
-
+  # - ../../data/merged-histogram-Inc-WZ-2018-new_fw.pkl.gz
+  # - ../../data/merged-histogram-Inc-WZ_FV-2018-FV.pkl.gz
+  - ../../data/merged-histogram-Inc-WZ_pol-2018-lab_frame_split_templates.pkl.gz
 xsections:
   !include xsections_2018.yaml
 
@@ -169,6 +170,132 @@ groups:
   WZ:
     processes:
       - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_W_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_W_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_W_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_W_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wp_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Wm_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WpZ_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_long:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_left:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_right:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8_Z_WmZ_right
     type:
       signal
     color:
@@ -480,7 +607,7 @@ plotting:
             range: [0, 5]
             blind: false
 
-    inc-SR0:
+    inc-SR01:
         dilep_mt_llnunu:
             rebin: 4
             range: [0, 1000]
@@ -497,6 +624,10 @@ plotting:
             blind: true
         mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
+            range: [0, 1500]
+            blind: true
+        m_lep:
+            rebin: 2
             range: [0, 1500]
             blind: true
         inv_m_WZ:
@@ -1309,7 +1440,7 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-    inc-D0:
+    inc-D01:
         dilep_mt_llnunu:
             rebin: 2
             range: [0, 400]
@@ -1427,7 +1558,7 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-    inc-VR0:
+    inc-VR01:
         dilep_mt_llnunu:
             rebin: 2
             range: [150, 600]

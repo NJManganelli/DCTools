@@ -1,5 +1,8 @@
 boosthist:
-  - ../../data/merged-histogram-Inc-WZ_DD-2024-latest.pkl.gz 
+  # - ../../data/merged-histogram-Inc-WZ_DD-2024-latest.pkl.gz
+  # - ../../data/merged-histogram-Inc-WZ_FV-2024-FV.pkl.gz
+  # - ../../data/merged-histogram-Inc-WZ-2024-new_fw.pkl.gz
+  - ../../data/merged-histogram-Inc-WZ_pol-2024-lab_frame_split_templates.pkl.gz
   # - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz 
 
 xsections:
@@ -109,6 +112,132 @@ groups:
       signal
     color:
       "#46B3A5"
+  WZ_W_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_W_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_W_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wp_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wp_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wp_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wp_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wm_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wm_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Wm_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Wm_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WpZ_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WpZ_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WpZ_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WpZ_right
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_long:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WmZ_long
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_left:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WmZ_left
+    type:
+      signal
+    color:
+      "#46B3A5"
+  WZ_Z_WmZ_right:
+    processes:
+      - WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_Z_WmZ_right
+    type:
+      signal
+    color:
+      "#46B3A5"
   data:
     processes:
       - Muon0
@@ -120,26 +249,6 @@ groups:
       data
     color:
       "#181926"
-
-  # ── Polarization signal templates ───────────────────────────────────────
-  # Same as 2018: injected on the fly by make_card.py --mode polarization
-  # --boson <W|Wp|Wm|Z> (which drops the inclusive WZ and sets the observable).
-  # Uncomment a boson's three groups ONLY if building WITHOUT --mode polarization;
-  # in that case also comment out the inclusive WZ above. Processes reference the
-  # split datasets from split_polarization_datasets, registered in xsections_2024.
-  # WZ_W_long:
-  #   processes: [WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_long]
-  #   type: signal
-  #   color: "#1B7F73"
-  # WZ_W_left:
-  #   processes: [WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_left]
-  #   type: signal
-  #   color: "#46B3A5"
-  # WZ_W_right:
-  #   processes: [WZto3LNu_TuneCP5_13p6TeV_powheg-pythia8_W_right]
-  #   type: signal
-  #   color: "#93D5CC"
-  # (repeat for Wp / Wm / Z as in xsections_2024.yaml)
 
 plotting:
     inc-B01:
