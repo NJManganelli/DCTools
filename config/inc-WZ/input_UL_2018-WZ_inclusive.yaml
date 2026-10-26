@@ -338,17 +338,17 @@ plotting:
             rebin: 1 
             range: [60, 120]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin: [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -356,7 +356,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -364,7 +364,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
@@ -372,7 +372,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -400,27 +400,27 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        deep_tau_jet:
+        tau_loose_deeptau_vsjet:
             rebin: 1
             range: [0.0, 1.2]
             blind: false
-        deep_tau_e:
+        tau_loose_deeptau_vse:
             rebin: 1
             range: [0, 1]
             blind: false
-        deep_tau_mu:
+        tau_loose_deeptau_vsmu:
             rebin: 1
             range: [0, 1]
             blind: false
-        delta_R_non_iso_lep_loose_tau:
+        tau_loose_dR_nonisolep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_tight_tau:
+        tau_loose_dR_looselep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_vtight_tau:
+        tau_loose_dR_tightlep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
@@ -434,17 +434,17 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin : [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -456,7 +456,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -464,7 +464,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -505,7 +505,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -521,7 +521,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -558,7 +558,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -574,7 +574,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -616,21 +616,21 @@ plotting:
             rebin: 3 
             range: [0, 300]
             blind: true
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             # rebin: [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: true
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
-        m_lep:
+        tau_loosetovtight_m_lep:
             rebin: 2
             range: [0, 1500]
             blind: true
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
@@ -646,7 +646,7 @@ plotting:
             rebin: 1 
             range: [0, 300]
             blind: true
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 2 
             range: [0, 300]
             blind: true
@@ -658,39 +658,39 @@ plotting:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_tau_met_phi:
+        tau_vtight_dphi_met:
             rebin: 10
             range: [0, 3.14159]
             blind: true
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_phi:
+        tau_vtight_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_eta:
+        tau_vtight_eta:
             rebin: 1
             range: [1, 2.5]
             blind: true
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: true
-        taus_phi_loose:
+        tau_loose_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_eta_loose:
+        tau_loose_eta:
             rebin: 1
             range: [0, 2.5]
             blind: true
-        dilep_dphi_tau:
+        tau_vtight_dphi_dilep:
             rebin: 1
             range: [1, 3.14159]
             blind: true
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 3.14159]
             blind: true
@@ -698,15 +698,15 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: true
-        deep_tau_jet:
+        tau_loose_deeptau_vsjet:
             rebin: 1
             range: [0, 1.2]
             blind: true
-        deep_tau_e:
+        tau_loose_deeptau_vse:
             rebin: 1
             range: [0, 1]
             blind: true
-        deep_tau_mu:
+        tau_loose_deeptau_vsmu:
             rebin: 1
             range: [0, 1]
             blind: true
@@ -730,19 +730,19 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: true
-        delta_R_non_iso_lep_loose_tau:
+        tau_loose_dR_nonisolep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_non_iso_lep_tight_tau:
+        tau_loose_dR_looselep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_non_iso_lep_vtight_tau:
+        tau_loose_dR_tightlep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_jet_tau:
+        tau_vtight_dR_leadjet:
             rebin: 1
             range: [1, 3.14159]
             blind: true
@@ -755,17 +755,17 @@ plotting:
             rebin: 3 
             range: [0, 300]
             blind: true
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             # rebin: [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             range: [0, 1500]
             blind: true
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: true
@@ -781,7 +781,7 @@ plotting:
             rebin: 1 
             range: [0, 300]
             blind: true
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 2 
             range: [0, 300]
             blind: true
@@ -793,39 +793,39 @@ plotting:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_tau_met_phi:
+        tau_vtight_dphi_met:
             rebin: 10
             range: [0, 3.14159]
             blind: true
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_phi:
+        tau_vtight_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_eta:
+        tau_vtight_eta:
             rebin: 1
             range: [1, 2.5]
             blind: true
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: true
-        taus_phi_loose:
+        tau_loose_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        taus_eta_loose:
+        tau_loose_eta:
             rebin: 1
             range: [0, 2.5]
             blind: true
-        dilep_dphi_tau:
+        tau_vtight_dphi_dilep:
             rebin: 1
             range: [1, 3.14159]
             blind: true
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 3.14159]
             blind: true
@@ -833,15 +833,15 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: true
-        deep_tau_jet:
+        tau_loose_deeptau_vsjet:
             rebin: 1
             range: [0, 1.2]
             blind: true
-        deep_tau_e:
+        tau_loose_deeptau_vse:
             rebin: 1
             range: [0, 1]
             blind: true
-        deep_tau_mu:
+        tau_loose_deeptau_vsmu:
             rebin: 1
             range: [0, 1]
             blind: true
@@ -865,19 +865,19 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: true
-        delta_R_non_iso_lep_loose_tau:
+        tau_loose_dR_nonisolep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_non_iso_lep_tight_tau:
+        tau_loose_dR_looselep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_non_iso_lep_vtight_tau:
+        tau_loose_dR_tightlep:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R_jet_tau:
+        tau_vtight_dR_leadjet:
             rebin: 1
             range: [1, 3.14159]
             blind: true
@@ -886,7 +886,7 @@ plotting:
     #         rebin: 4
     #         range: [0, 1000]
     #         blind: true
-    #     dilep_tau_loose_met_hadron_mt:
+    #     tau_loosetovtight_dilep_met_hadron_mt:
     #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
     #         range: [0, 1500]
     #         blind: true
@@ -894,11 +894,11 @@ plotting:
     #         rebin: 1
     #         range: [0, 600]
     #         blind: true
-    #     mT_WZ:
+    #     tau_loosetovtight_mT_WZ:
     #         rebin: [30, 30, 30, 60]
     #         range: [0, 1500]
     #         blind: true
-    #     inv_m_WZ:
+    #     tau_loosetovtight_inv_m_WZ:
     #         rebin: [30, 30, 30, 60]
     #         range: [0, 1500]
     #         blind: true
@@ -926,23 +926,23 @@ plotting:
     #         rebin: 2 
     #         range: [0, 300]
     #         blind: true
-    #     taus_phi:
+    #     tau_vtight_phi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_eta:
+    #     tau_vtight_eta:
     #         rebin: 1
     #         range: [0, 2.5]
     #         blind: true
-    #     tau_pt_loose:
+    #     tau_loose_pt:
     #         rebin: 2 
     #         range: [0, 300]
     #         blind: true
-    #     taus_phi_loose:
+    #     tau_loose_phi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_eta_loose:
+    #     tau_loose_eta:
     #         rebin: 1
     #         range: [0, 2.5]
     #         blind: true
@@ -950,15 +950,15 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_tau_met_phi:
+    #     tau_vtight_dphi_met:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     dilep_dphi:
+    #     dilep_ll_dphi:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     dilep_dphi_tau:
+    #     tau_vtight_dphi_dilep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
@@ -966,7 +966,7 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R:
+    #     tau_vtight_dR_dilep:
     #         rebin: 1
     #         range: [0, 3.5]
     #         blind: true
@@ -978,19 +978,19 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R_jet_tau:
+    #     tau_vtight_dR_leadjet:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     deep_tau_jet:
+    #     tau_loose_deeptau_vsjet:
     #         rebin: 1
     #         range: [0.8, 1.2]
     #         blind: true
-    #     deep_tau_e:
+    #     tau_loose_deeptau_vse:
     #         rebin: 1
     #         range: [0, 1]
     #         blind: true
-    #     deep_tau_mu:
+    #     tau_loose_deeptau_vsmu:
     #         rebin: 1
     #         range: [0, 1]
     #         blind: true
@@ -1019,7 +1019,7 @@ plotting:
     #         rebin: 4
     #         range: [0, 1000]
     #         blind: true
-    #     dilep_tau_loose_met_hadron_mt:
+    #     tau_loosetovtight_dilep_met_hadron_mt:
     #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
     #         range: [0, 1500]
     #         blind: true
@@ -1027,11 +1027,11 @@ plotting:
     #         rebin: 1
     #         range: [0, 600]
     #         blind: true
-    #     mT_WZ:
+    #     tau_loosetovtight_mT_WZ:
     #         rebin: [30, 30, 30, 60]
     #         range: [0, 1500]
     #         blind: true
-    #     inv_m_WZ:
+    #     tau_loosetovtight_inv_m_WZ:
     #         rebin: [30, 30, 30, 60]
     #         range: [0, 1500]
     #         blind: true
@@ -1059,23 +1059,23 @@ plotting:
     #         rebin: 2 
     #         range: [0, 300]
     #         blind: true
-    #     taus_phi:
+    #     tau_vtight_phi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_eta:
+    #     tau_vtight_eta:
     #         rebin: 1
     #         range: [0, 2.5]
     #         blind: true
-    #     tau_pt_loose:
+    #     tau_loose_pt:
     #         rebin: 2 
     #         range: [0, 300]
     #         blind: true
-    #     taus_phi_loose:
+    #     tau_loose_phi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_eta_loose:
+    #     tau_loose_eta:
     #         rebin: 1
     #         range: [0, 2.5]
     #         blind: true
@@ -1083,15 +1083,15 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_tau_met_phi:
+    #     tau_vtight_dphi_met:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     dilep_dphi:
+    #     dilep_ll_dphi:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     dilep_dphi_tau:
+    #     tau_vtight_dphi_dilep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
@@ -1099,7 +1099,7 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R:
+    #     tau_vtight_dR_dilep:
     #         rebin: 1
     #         range: [0, 3.5]
     #         blind: true
@@ -1111,7 +1111,7 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R_jet_tau:
+    #     tau_vtight_dR_leadjet:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
@@ -1144,7 +1144,7 @@ plotting:
     #         rebin: 3 
     #         range: [0, 300]
     #         blind: true
-    #     dilep_tau_loose_met_hadron_mt:
+    #     tau_loosetovtight_dilep_met_hadron_mt:
     #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 10, 65]
     #         range: [0, 1500]
     #         blind: true
@@ -1152,11 +1152,11 @@ plotting:
     #         rebin: 1
     #         range: [0, 600]
     #         blind: true
-    #     mT_WZ:
+    #     tau_loosetovtight_mT_WZ:
     #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 10, 65]
     #         range: [0, 1500]
     #         blind: true
-    #     inv_m_WZ:
+    #     tau_loosetovtight_inv_m_WZ:
     #         rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 10, 65]
     #         range: [0, 1500]
     #         blind: true
@@ -1184,27 +1184,27 @@ plotting:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     delta_tau_met_phi:
+    #     tau_vtight_dphi_met:
     #         rebin: 10
     #         range: [0, 3.14159]
     #         blind: true
-    #     dilep_dphi:
+    #     dilep_ll_dphi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_phi:
+    #     tau_vtight_phi:
     #         rebin: 1
     #         range: [0, 3.14159]
     #         blind: true
-    #     taus_eta:
+    #     tau_vtight_eta:
     #         rebin: 1
     #         range: [1, 2.5]
     #         blind: true
-    #     dilep_dphi_tau:
+    #     tau_vtight_dphi_dilep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R:
+    #     tau_vtight_dR_dilep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
@@ -1212,27 +1212,27 @@ plotting:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     deep_tau_jet:
+    #     tau_loose_deeptau_vsjet:
     #         rebin: 1
     #         range: [0.8, 1.2]
     #         blind: true
-    #     deep_tau_e:
+    #     tau_loose_deeptau_vse:
     #         rebin: 1
     #         range: [0, 1]
     #         blind: true
-    #     deep_tau_mu:
+    #     tau_loose_deeptau_vsmu:
     #         rebin: 1
     #         range: [0, 1]
     #         blind: true
-    #     delta_R_non_iso_lep_loose_tau:
+    #     tau_loose_dR_nonisolep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R_non_iso_lep_tight_tau:
+    #     tau_loose_dR_looselep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
-    #     delta_R_non_iso_lep_vtight_tau:
+    #     tau_loose_dR_tightlep:
     #         rebin: 1
     #         range: [1, 3.14159]
     #         blind: true
@@ -1257,15 +1257,15 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -1310,15 +1310,15 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -1359,15 +1359,15 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -1408,15 +1408,15 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -1445,7 +1445,7 @@ plotting:
             rebin: 2
             range: [0, 400]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
             # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
             # rebin: 1
@@ -1463,19 +1463,19 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        taus_phi:
+        tau_vtight_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [1,1,1,1,1,1,1,1,1,1,10,40,40]
             range: [0, 1000]
             blind: false
@@ -1504,13 +1504,13 @@ plotting:
             rebin: 2
             range: [0, 400]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             rebin: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 5, 10, 10, 30, 50]
             # rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 65]
             # rebin: 1
             range: [0, 400]
             blind: false
-        taus_phi:
+        tau_vtight_phi:
             rebin: 1
             range: [0, 3.14159]
             blind: true
@@ -1526,15 +1526,15 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
-        delta_R:
+        tau_vtight_dR_dilep:
             rebin: 1
             range: [1, 5]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: 1
             range: [0, 600]
             blind: false
@@ -1571,17 +1571,17 @@ plotting:
             rebin: 1 
             range: [60, 120]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin: [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -1589,7 +1589,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -1597,7 +1597,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
@@ -1605,7 +1605,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -1633,27 +1633,27 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        deep_tau_jet:
+        tau_loose_deeptau_vsjet:
             rebin: 1
             range: [0.0, 1.2]
             blind: false
-        deep_tau_e:
+        tau_loose_deeptau_vse:
             rebin: 1
             range: [0, 1]
             blind: false
-        deep_tau_mu:
+        tau_loose_deeptau_vsmu:
             rebin: 1
             range: [0, 1]
             blind: false
-        delta_R_non_iso_lep_loose_tau:
+        tau_loose_dR_nonisolep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_tight_tau:
+        tau_loose_dR_looselep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_vtight_tau:
+        tau_loose_dR_tightlep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
@@ -1680,17 +1680,17 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin : [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -1702,7 +1702,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -1710,7 +1710,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -1742,7 +1742,7 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
@@ -1766,27 +1766,27 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        deep_tau_jet:
+        tau_loose_deeptau_vsjet:
             rebin: 1
             range: [0.0, 1.2]
             blind: false
-        deep_tau_e:
+        tau_loose_deeptau_vse:
             rebin: 1
             range: [0, 1]
             blind: false
-        deep_tau_mu:
+        tau_loose_deeptau_vsmu:
             rebin: 1
             range: [0, 1]
             blind: false
-        delta_R_non_iso_lep_loose_tau:
+        tau_loose_dR_nonisolep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_tight_tau:
+        tau_loose_dR_looselep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
-        delta_R_non_iso_lep_vtight_tau:
+        tau_loose_dR_tightlep:
             rebin: 1
             range: [0, 3.14159]
             blind: false
@@ -1800,17 +1800,17 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin : [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -1822,7 +1822,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -1830,7 +1830,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -1862,7 +1862,7 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
@@ -1875,17 +1875,17 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        dilep_tau_loose_met_hadron_mt:
+        tau_loosetovtight_dilep_met_hadron_mt:
             # rebin: [16, 7, 7, 30, 40, 50]
             rebin: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 20, 65]
             # rebin : [16, 2, 2, 3, 10, 12, 20, 20, 25, 40]
             range: [0, 1500]
             blind: false
-        mT_WZ:
+        tau_loosetovtight_mT_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
-        inv_m_WZ:
+        tau_loosetovtight_inv_m_WZ:
             rebin: [16, 7, 7, 30, 40, 50]
             range: [0, 1500]
             blind: false
@@ -1897,7 +1897,7 @@ plotting:
             rebin: 2 
             range: [0, 300]
             blind: false
-        tau_pt_loose:
+        tau_loose_pt:
             rebin: 2 
             range: [0, 300]
             blind: false
@@ -1905,7 +1905,7 @@ plotting:
             rebin: 1
             range: [1, 3.14159]
             blind: false
-        dilep_dphi:
+        dilep_ll_dphi:
             rebin: 1
             range: [1, 3.14159]
             blind: false
@@ -1937,7 +1937,7 @@ plotting:
             rebin: 1
             range: [0, 5]
             blind: false
-        tau_pt_vtight:
+        tau_vtight_pt:
             rebin: 1 
             range: [0, 300]
             blind: false
@@ -1958,10 +1958,10 @@ datadriven:
                 correctionset_output_label: fake_rate
                 correctionset_output_description: fake rate for Drell-Yan
                 channels:
-                    inc-D0: tau_pt_vtight
-                    inc-D1: tau_pt_vtight
-                    inc-C0: tau_pt_loose
-                    inc-C1: tau_pt_loose
+                    inc-D0: tau_vtight_pt
+                    inc-D1: tau_vtight_pt
+                    inc-C0: tau_loose_pt
+                    inc-C1: tau_loose_pt
                 channel_ratios:
                     0:
                         numerator: inc-D0
@@ -1970,12 +1970,12 @@ datadriven:
                         numerator: inc-D1
                         denominator: inc-C1
                 update_axes_meta:
-                    # rename tau_pt_loose axis name so that histograms can be added consistently
-                    tau_pt_loose:
+                    # rename tau_loose_pt axis name so that histograms can be added consistently
+                    tau_loose_pt:
                         name: tau_pt
-                    tau_pt_tight:
+                    tau_tight_pt:
                         name: tau_pt
-                    tau_pt_vtight:
+                    tau_vtight_pt:
                         name: tau_pt
                 dict_to_hist_axis:
                     axis_name: jet_multiplicity
@@ -1995,10 +1995,10 @@ datadriven:
                 correctionset_output_label: fake_rate
                 correctionset_output_description: fake rate for Drell-Yan
                 channels:
-                    inc-IR0L: tau_pt_tight
-                    inc-IR1L: tau_pt_tight
-                    inc-C0: tau_pt_loose
-                    inc-C1: tau_pt_loose
+                    inc-IR0L: tau_tight_pt
+                    inc-IR1L: tau_tight_pt
+                    inc-C0: tau_loose_pt
+                    inc-C1: tau_loose_pt
                 channel_ratios:
                     0:
                         numerator: inc-IR0L
@@ -2007,12 +2007,12 @@ datadriven:
                         numerator: inc-IR1L
                         denominator: inc-C1
                 update_axes_meta:
-                    # rename tau_pt_loose axis name so that histograms can be added consistently
-                    tau_pt_loose:
+                    # rename tau_loose_pt axis name so that histograms can be added consistently
+                    tau_loose_pt:
                         name: tau_pt
-                    tau_pt_tight:
+                    tau_tight_pt:
                         name: tau_pt
-                    tau_pt_vtight:
+                    tau_vtight_pt:
                         name: tau_pt
                 dict_to_hist_axis:
                     axis_name: jet_multiplicity
@@ -2032,18 +2032,18 @@ datadriven:
                 correctionset_output_label: prob_dy
                 correctionset_output_description: probability event comes from Drell-Yan (High MET for SR / IR*H in inc-WZ) 
                 channels:
-                    inc-B0: tau_pt_loose
-                    inc-B1: tau_pt_loose
+                    inc-B0: tau_loose_pt
+                    inc-B1: tau_loose_pt
                 channel_absolutes:
                     0: inc-B0
                     1: inc-B1
                 update_axes_meta:
-                    # rename tau_pt_loose axis name so that histograms can be added consistently
-                    tau_pt_loose:
+                    # rename tau_loose_pt axis name so that histograms can be added consistently
+                    tau_loose_pt:
                         name: tau_pt
-                    tau_pt_tight:
+                    tau_tight_pt:
                         name: tau_pt
-                    tau_pt_vtight:
+                    tau_vtight_pt:
                         name: tau_pt
                 dict_to_hist_axis:
                     axis_name: jet_multiplicity
@@ -2063,18 +2063,18 @@ datadriven:
                 correctionset_output_label: prob_dy
                 correctionset_output_description: probability event comes from Drell-Yan (Medium MET for VB / VR / IR*M in inc-WZ) 
                 channels:
-                    inc-VB0: tau_pt_loose
-                    inc-VB1: tau_pt_loose
+                    inc-VB0: tau_loose_pt
+                    inc-VB1: tau_loose_pt
                 channel_absolutes:
                     0: inc-VB0
                     1: inc-VB1
                 update_axes_meta:
-                    # rename tau_pt_loose axis name so that histograms can be added consistently
-                    tau_pt_loose:
+                    # rename tau_loose_pt axis name so that histograms can be added consistently
+                    tau_loose_pt:
                         name: tau_pt
-                    tau_pt_tight:
+                    tau_tight_pt:
                         name: tau_pt
-                    tau_pt_vtight:
+                    tau_vtight_pt:
                         name: tau_pt
                 dict_to_hist_axis:
                     axis_name: jet_multiplicity
@@ -2094,18 +2094,18 @@ datadriven:
                 correctionset_output_label: prob_dy
                 correctionset_output_description: probability event comes from Drell-Yan (Low MET for CR / IR*L in inc-WZ) 
                 channels:
-                    inc-C0: tau_pt_loose
-                    inc-C1: tau_pt_loose
+                    inc-C0: tau_loose_pt
+                    inc-C1: tau_loose_pt
                 channel_absolutes:
                     0: inc-C0
                     1: inc-C1
                 update_axes_meta:
-                    # rename tau_pt_loose axis name so that histograms can be added consistently
-                    tau_pt_loose:
+                    # rename tau_loose_pt axis name so that histograms can be added consistently
+                    tau_loose_pt:
                         name: tau_pt
-                    tau_pt_tight:
+                    tau_tight_pt:
                         name: tau_pt
-                    tau_pt_vtight:
+                    tau_vtight_pt:
                         name: tau_pt
                 dict_to_hist_axis:
                     axis_name: jet_multiplicity

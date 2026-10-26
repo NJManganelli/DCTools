@@ -18,12 +18,12 @@ from statsmodels.nonparametric.smoothers_lowess import lowess
 
 # boson -> fit observable; must match BOSON_CONFIG in SMQawa/polarization_split.py
 BOSON_OBS = {
-    "W":     "qcos_theta_w_reco",    # W, inclusive WZ (charge-folded angle)
-    "Wp":    "cos_theta_wp_reco",    # W+
-    "Wm":    "cos_theta_wm_reco",    # W-
+    "W":     "tau_loosetovtight_qcos_theta_w_reco",    # W, inclusive WZ (charge-folded angle)
+    "Wp":    "tau_loosetovtight_cos_theta_wp_reco",    # W+
+    "Wm":    "tau_loosetovtight_cos_theta_wm_reco",    # W-
     "Z":     "cos_theta_z_reco",     # Z, inclusive WZ
-    "Z_WpZ": "cos_theta_wpz_reco",   # Z in W+Z
-    "Z_WmZ": "cos_theta_wmz_reco",   # Z in W-Z
+    "Z_WpZ": "tau_loosetovtight_cos_theta_wpz_reco",   # Z in W+Z
+    "Z_WmZ": "tau_loosetovtight_cos_theta_wmz_reco",   # Z in W-Z
 }
 POLS = ("long", "left", "right")
 # the 18 split-signal config groups WZ_<boson>_<pol> (only used in polarization mode)
