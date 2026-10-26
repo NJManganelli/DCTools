@@ -225,7 +225,7 @@ def infer_polarization_boson(variable):
 
     Returns one of "Wp", "Wm", "Z", "W", or ``None`` when no boson token is present (in which
     case the caller falls back to no split). Charge-specific tokens (wp/wm) are tested before
-    the bare w so e.g. "cos_theta_wp_reco" -> "Wp" rather than "W".
+    the bare w so e.g. "tau_loosetovtight_cos_theta_wp_reco" -> "Wp" rather than "W".
     """
     v = variable.lower()
     if "wp" in v:
