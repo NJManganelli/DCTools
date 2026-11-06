@@ -1,12 +1,18 @@
 boosthist:
-  # - ../../data/merged-histogram-Inc-WZ_DD-2024-latest.pkl.gz
-  # - ../../data/merged-histogram-Inc-WZ_FV-2024-FV.pkl.gz
-  # - ../../data/merged-histogram-Inc-WZ-2024-new_fw.pkl.gz
-  # - ../../data/merged-histogram-Inc-WZ_pol-2024-lab_frame_split_templates.pkl.gz
-  - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-Data.pkl.gz
-  - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-MC-signal.pkl.gz
-  - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-MC-backgrounds.pkl.gz
-  # - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz 
+  default:
+    - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-Data.pkl.gz
+    - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-MC-signal.pkl.gz
+    - ../../data/merged-histogram-Inc-WZ_DD-2024-latest-MC-backgrounds.pkl.gz
+  dd_combined:
+    - ../../data/merged-histogram-Inc-WZ_DD-2024-latest.pkl.gz
+  pol:
+    - ../../data/merged-histogram-Inc-WZ_pol-2024-lab_frame_split_templates.pkl.gz
+  fv:
+    - ../../data/merged-histogram-Inc-WZ_FV-2024-FV.pkl.gz
+  new_fw:
+    - ../../data/merged-histogram-Inc-WZ-2024-new_fw.pkl.gz
+  with_dddy:
+    - ../../data/merged-histogram-Inc-WZ-2024-latest_with_DDDY.pkl.gz
 
 xsections:
   !include xsections_2024.yaml 

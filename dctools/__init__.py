@@ -320,17 +320,26 @@ def read_combinehist(config):
             traceback.print_exc()
     return combinehistos
 
-def read_config(file: str):
+def read_config(file: str, inputs: str = None):
+    """Load a DCTools config. boosthist is either a list of histogram files or a mapping of named input sets
+    (e.g. default, pol, fv) to such lists, of which inputs selects one (default: "default")."""
     cfg_dir = os.path.dirname(os.path.abspath(file))
     with open(file) as f:
         try:
             # Pass the file handle (not f.read()) so config_loader._root becomes the config
             # file's directory and `!include` resolves relative to it.
-            config = config_input(
-                yaml.load(f, config_loader)
-            )
+            cfg = yaml.load(f, config_loader)
+            files = cfg["boosthist"]
+            if isinstance(files, dict):
+                name = inputs or "default"
+                if name not in files:
+                    raise KeyError(f"{file}: no boosthist input set {name!r}, choose one of {sorted(files)}")
+                files = files[name]
+            elif inputs is not None:
+                raise ValueError(f"{file}: boosthist is a single list, so it has no input set {inputs!r}")
+            config = config_input(cfg)
             boosthist:Dict = {}
-            for fname in config.boosthist:
+            for fname in files:
                 # Resolve as-given (CWD-relative / absolute) first, then relative to the config file.
                 resolved = fname if os.path.exists(fname) else os.path.join(cfg_dir, fname)
                 if '.gz' in resolved:

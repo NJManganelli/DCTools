@@ -394,6 +394,7 @@ def plan_group(mode, boson, name, gtype, channel):
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-WZ_inclusive.yaml")
+    parser.add_argument("--inputs", type=str , default=None, help="named boosthist input set of the config (default: default)")
     parser.add_argument("-v"  , "--variable", type=str , default="dilep_pt")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
@@ -413,7 +414,7 @@ def main():
                              "Z_WpZ (Z in W+Z) or Z_WmZ (Z in W-Z)")
 
     options = parser.parse_args()
-    config = dctools.read_config(options.input)
+    config = dctools.read_config(options.input, options.inputs)
 
     if len(options.channel) == 1:
         options.channel = options.channel[0]

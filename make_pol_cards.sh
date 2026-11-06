@@ -5,5 +5,5 @@ for BOSON in W Wp Wm Z Z_WpZ Z_WmZ; do
   # python makecard-boost-WZ_asym_FV_pol.py --name WZpol_${BOSON} --input ./config/inc-WZ/input_UL_2017-WZ_inclusive.yaml    --era 2017    --mode polarization --boson ${BOSON} --channel inc-SR01 -rrt datadriven
   # python makecard-boost-WZ_asym_FV_pol.py --name WZpol_${BOSON} --input ./config/inc-WZ/input_UL_2016-WZ_inclusive.yaml    --era 2016    --mode polarization --boson ${BOSON} --channel inc-SR01 -rrt datadriven
   # python makecard-boost-WZ_asym_FV_pol.py --name WZpol_${BOSON} --input ./config/inc-WZ/input_UL_2016APV-WZ_inclusive.yaml --era 2016APV --mode polarization --boson ${BOSON} --channel inc-SR01 -rrt datadriven
-  python makecard-boost-WZ_asym_FV_pol.py --name WZpol_${BOSON} --input ./config/inc-WZ/input_UL_2024-WZ_inclusive.yaml    --era 2024    --mode polarization --boson ${BOSON} --channel inc-SR01 -rrt datadriven
+  python makecard-boost-WZ_asym_FV_pol.py --name WZpol_${BOSON} --input ./config/inc-WZ/input_UL_2024-WZ_inclusive.yaml --inputs pol --era 2024    --mode polarization --boson ${BOSON} --channel inc-SR01 -rrt datadriven
 done
