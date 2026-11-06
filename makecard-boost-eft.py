@@ -64,6 +64,7 @@ yaml.add_constructor('!include', construct_include, config_loader)
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018_timgad-vbs.yaml")
+    parser.add_argument("--inputs", type=str , default=None, help="named boosthist input set of the config (default: default)")
     parser.add_argument("-v"  , "--variable", type=str , default="nnscore")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
@@ -79,7 +80,7 @@ def main():
     parser.add_argument('--checksyst', action='store_true')
 
     options = parser.parse_args()
-    config = dctools.read_config(options.input)
+    config = dctools.read_config(options.input, options.inputs)
 
     print(f'making: {options.channel} : {options.variable} : {options.era}')
     

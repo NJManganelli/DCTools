@@ -63,6 +63,7 @@ from dctools import dict_to_hist_axis
 def main():
     parser = argparse.ArgumentParser(description='DCTools Plotting Tool')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018_timgad-vbs.yaml")
+    parser.add_argument("--inputs", type=str , default=None, help="named boosthist input set of the config (default: default)")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-v"  , "--variables", nargs="*", type=str)
     parser.add_argument("-c"  , "--channels" , nargs='*', type=str)
@@ -78,7 +79,7 @@ def main():
     parser.add_argument('--logx', action="store_true", help="make x axis in log scale")
 
     options = parser.parse_args()
-    config = dctools.read_config(options.input)
+    config = dctools.read_config(options.input, options.inputs)
 
     if options.combine_fit in ["prefit", "fit_b", "fit_s"]:
         if options.logx:

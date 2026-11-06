@@ -293,6 +293,7 @@ def detect_polarization_signals(base_processes, boosthist, observable, mode, bas
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-WZ_inclusive.yaml")
+    parser.add_argument("--inputs", type=str , default=None, help="named boosthist input set of the config (default: default)")
     parser.add_argument("-v"  , "--variable", type=str , default="dilep_pt")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
@@ -317,7 +318,7 @@ def main():
     parser.add_argument("-rrt", "--remap_replacement_types", nargs='*', type=str, default=[])
 
     options = parser.parse_args()
-    config = dctools.read_config(options.input)
+    config = dctools.read_config(options.input, options.inputs)
 
     print(f'making: {options.channel} : {options.variable} : {options.era}')
 
